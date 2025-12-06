@@ -3,493 +3,281 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family Data Manager</title>
+    <title>PIN Login Debug</title>
     <style>
-        :root {
-            --primary: #667eea;
-            --secondary: #764ba2;
-            --success: #10b981;
-            --danger: #ef4444;
-            --light: #f8fafc;
-            --dark: #1e293b;
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
         
-        /* Login Screen */
-        .login-container {
+        .container {
             background: white;
-            border-radius: 1rem;
+            border-radius: 15px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            padding: 2rem;
-            max-width: 400px;
-            margin: 2rem auto;
-            text-align: center;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .login-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-        
-        .login-input {
-            margin: 1.5rem 0;
-        }
-        
-        /* Main App */
-        .app-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 800px;
             overflow: hidden;
-            display: none;
         }
         
-        /* Alerts container */
-        #login-alert {
-            max-height: 300px;
-            overflow-y: auto;
-            margin-top: 1rem;
-            padding-right: 0.5rem;
-        }
-        
-        #login-alert .alert {
-            margin-bottom: 0.5rem;
-            animation: slideIn 0.3s ease;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            font-size: 0.9rem;
-            text-align: left;
-            line-height: 1.4;
-        }
-        
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Scrollbar styling */
-        #login-alert::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        #login-alert::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 3px;
-        }
-        
-        #login-alert::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 3px;
-        }
-        
-        .alert-success {
-            background: #d1fae5;
-            color: #065f46;
-            border-left: 4px solid #10b981;
-        }
-        
-        .alert-error {
-            background: #fee2e2;
-            color: #991b1b;
-            border-left: 4px solid #ef4444;
-        }
-        
-        .alert-info {
-            background: #dbeafe;
-            color: #1e40af;
-            border-left: 4px solid #3b82f6;
-        }
-        
-        header {
-            background: var(--dark);
+        .header {
+            background: #1e293b;
             color: white;
-            padding: 1.5rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 25px 30px;
+            text-align: center;
         }
         
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1.5rem;
-            font-weight: bold;
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
         }
         
-        .tabs {
-            display: flex;
-            background: #f1f5f9;
-            border-bottom: 2px solid #e2e8f0;
+        .header p {
+            color: #cbd5e1;
+            font-size: 14px;
         }
         
-        .tab-btn {
-            padding: 1rem 2rem;
-            background: none;
-            border: none;
-            cursor: pointer;
+        .content {
+            padding: 30px;
+        }
+        
+        .current-config {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .config-item {
+            display: flex;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .config-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .config-label {
             font-weight: 600;
-            color: #64748b;
-            transition: all 0.3s;
-            border-bottom: 3px solid transparent;
+            color: #475569;
+            width: 200px;
         }
         
-        .tab-btn:hover {
-            background: #e2e8f0;
+        .config-value {
+            flex: 1;
+            font-family: monospace;
+            word-break: break-all;
         }
         
-        .tab-btn.active {
-            color: var(--primary);
-            border-bottom: 3px solid var(--primary);
-            background: white;
+        .login-section {
+            margin-bottom: 30px;
         }
         
-        .tab-content {
-            display: none;
-            padding: 2rem;
-        }
-        
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        h2 {
-            color: var(--dark);
-            margin-bottom: 1.5rem;
-            font-size: 1.75rem;
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.25rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-group {
-            margin-bottom: 1rem;
+        .input-group {
+            margin-bottom: 20px;
         }
         
         label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 8px;
+            font-weight: 600;
             color: #475569;
-            font-weight: 500;
         }
         
-        .required::after {
-            content: " *";
-            color: var(--danger);
-        }
-        
-        input, textarea, select {
+        input {
             width: 100%;
-            padding: 0.75rem 1rem;
+            padding: 14px;
             border: 2px solid #e2e8f0;
-            border-radius: 0.5rem;
-            font-size: 1rem;
+            border-radius: 8px;
+            font-size: 16px;
             transition: border-color 0.3s;
         }
         
-        input:focus, textarea:focus, select:focus {
+        input:focus {
             outline: none;
-            border-color: var(--primary);
+            border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
-        textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-        
-        .btn {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            font-size: 1rem;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
+            width: 100%;
         }
         
-        .btn:hover {
+        button:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
         }
         
-        .btn:active {
+        button:active {
             transform: translateY(0);
         }
         
-        .btn-secondary {
-            background: #64748b;
-        }
-        
-        .btn-success {
-            background: var(--success);
-        }
-        
-        .controls {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-            flex-wrap: wrap;
-        }
-        
-        .data-container {
-            background: #f8fafc;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            max-height: 500px;
+        .debug-log {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            max-height: 400px;
             overflow-y: auto;
+            margin-top: 20px;
         }
         
-        .search-box {
-            flex: 1;
-            min-width: 300px;
+        .log-entry {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            animation: fadeIn 0.3s;
         }
         
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
+        .log-success {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid #10b981;
+            color: #10b981;
         }
         
-        .data-table th {
-            background: var(--primary);
-            color: white;
-            padding: 1rem;
-            text-align: left;
-            position: sticky;
-            top: 0;
+        .log-error {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+            color: #ef4444;
         }
         
-        .data-table td {
-            padding: 0.875rem 1rem;
-            border-bottom: 1px solid #e2e8f0;
+        .log-info {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+            color: #3b82f6;
         }
         
-        .data-table tr:hover {
-            background: #f1f5ff;
+        .log-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid #f59e0b;
+            color: #f59e0b;
         }
         
-        .logout-btn {
-            background: #64748b;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            cursor: pointer;
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 10px;
         }
         
-        .logout-btn:hover {
-            background: #475569;
+        .status-connected {
+            background: #d1fae5;
+            color: #065f46;
         }
         
-        @media (max-width: 768px) {
-            .app-container, .login-container {
-                margin: 0.5rem;
-                border-radius: 0.75rem;
-            }
-            
-            header {
-                flex-direction: column;
-                gap: 1rem;
-                text-align: center;
-            }
-            
-            .tabs {
-                flex-wrap: wrap;
-            }
-            
-            .tab-btn {
-                flex: 1;
-                padding: 0.75rem;
-                font-size: 0.9rem;
-            }
-            
-            .tab-content {
-                padding: 1rem;
-            }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .search-box {
-                min-width: 100%;
-            }
-            
-            .data-container {
-                max-height: 400px;
-            }
-            
-            .data-table {
-                display: block;
-                overflow-x: auto;
-            }
+        .status-disconnected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f0f9ff;
+            border-radius: 10px;
+            border: 1px solid #bae6fd;
+        }
+        
+        .result-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #e2e8f0;
         }
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
-    <div id="login-screen" class="login-container">
-        <div class="login-icon">🔐</div>
-        <h2>Family Data Manager</h2>
-        <p style="color: #64748b; margin-bottom: 1.5rem;">Enter your PIN to access the system</p>
-        
-        <div class="form-group login-input">
-            <input type="password" id="login-pin" placeholder="Enter your PIN" autocomplete="off">
+    <div class="container">
+        <div class="header">
+            <h1>🔐 PIN Login Debugger</h1>
+            <p>Shows encryption, database matching, and connection steps in real-time</p>
         </div>
         
-        <button class="btn" id="login-btn" style="width: 100%;">
-            🔑 Login
-        </button>
-        
-        <div id="login-alert"></div>
-        
-        <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e2e8f0;">
-            <p style="color: #94a3b8; font-size: 0.875rem;">
-                <strong>Admin Project:</strong> kmtrpnob.supabase.co<br>
-                <strong>Running from:</strong> <span id="current-url"></span>
-            </p>
-        </div>
-    </div>
-
-    <!-- Main App -->
-    <div id="app-container" class="app-container">
-        <header>
-            <div class="logo">
-                <span>📊</span>
-                <span>Family Data Manager</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <span style="color: #cbd5e1; font-size: 0.9rem;" id="current-user"></span>
-                <button class="logout-btn" onclick="logout()">
-                    👋 Logout
-                </button>
-            </div>
-        </header>
-        
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="form">📝 Fill Form</button>
-            <button class="tab-btn" data-tab="data">📊 View Data</button>
-        </div>
-        
-        <!-- Form Tab -->
-        <div id="form-tab" class="tab-content active">
-            <h2>📝 Family Purchase Form</h2>
-            
-            <div class="form-grid">
-                <div class="form-group">
-                    <label class="required">Form Serial Number</label>
-                    <input type="text" id="forms_sr_no" placeholder="Enter serial number">
+        <div class="content">
+            <!-- Current Configuration -->
+            <div class="current-config">
+                <h2 style="margin-bottom: 20px; color: #1e293b;">📋 Current Configuration</h2>
+                <div class="config-item">
+                    <div class="config-label">Admin Project URL:</div>
+                    <div class="config-value">https://kmtrpnob.supabase.co</div>
                 </div>
-                
-                <div class="form-group">
-                    <label class="required">Date</label>
-                    <input type="date" id="dated">
+                <div class="config-item">
+                    <div class="config-label">Admin API Key:</div>
+                    <div class="config-value">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttdHJwbmtmdGZxa3RobGdjE3NjM2M</div>
                 </div>
-                
-                <div class="form-group">
-                    <label class="required">Filled By</label>
-                    <input type="text" id="filled_by" placeholder="Your name">
+                <div class="config-item">
+                    <div class="config-label">Target Table:</div>
+                    <div class="config-value">admin_public (encrypted PINs)</div>
                 </div>
-                
-                <div class="form-group">
-                    <label>Approximate Amount (₹)</label>
-                    <input type="number" id="approximately_amount" placeholder="0.00" step="0.01">
+                <div class="config-item">
+                    <div class="config-label">Running On:</div>
+                    <div class="config-value" id="running-on">Checking...</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-label">Connection Status:</div>
+                    <div class="config-value">
+                        <span class="status-badge status-disconnected" id="conn-status">Not Connected</span>
+                    </div>
                 </div>
             </div>
             
-            <div class="form-group">
-                <label>Home Items Related To</label>
-                <input type="text" id="todays_select_home_items_related_to" placeholder="Food, Body Care, etc.">
-            </div>
-            
-            <div class="form-group">
-                <label>Items to Buy</label>
-                <textarea id="todays_select_items_to_buy" placeholder="Enter items separated by commas"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label>Comments</label>
-                <textarea id="comments_about_today_purchase" placeholder="Any comments about today's purchase..."></textarea>
-            </div>
-            
-            <div class="controls">
-                <button class="btn" id="submit-btn">
-                    📤 Submit Form
-                </button>
-                <button class="btn btn-secondary" id="reset-btn">
-                    🔄 Reset
-                </button>
-            </div>
-            
-            <div id="form-alert"></div>
-        </div>
-        
-        <!-- Data Tab -->
-        <div id="data-tab" class="tab-content">
-            <h2>📊 Family Data Records</h2>
-            
-            <div class="controls">
-                <div class="search-box">
-                    <input type="text" id="search-input" placeholder="Search records...">
+            <!-- Login Section -->
+            <div class="login-section">
+                <h2 style="margin-bottom: 20px; color: #1e293b;">🔑 Enter PIN to Test</h2>
+                <div class="input-group">
+                    <label for="pin-input">Your PIN:</label>
+                    <input type="password" id="pin-input" placeholder="Enter the PIN from admin_public table">
                 </div>
-                <button class="btn" id="refresh-btn">
-                    🔄 Refresh
-                </button>
-                <button class="btn btn-success" id="export-btn">
-                    📥 Export CSV
-                </button>
+                <button onclick="testLogin()">🔍 Test Login Process</button>
             </div>
             
-            <div class="data-container">
-                <table class="data-table" id="data-table">
-                    <thead>
-                        <tr>
-                            <th>SR No</th>
-                            <th>Date</th>
-                            <th>Filled By</th>
-                            <th>Items</th>
-                            <th>Amount</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="data-body">
-                        <!-- Data will load here -->
-                    </tbody>
-                </table>
+            <!-- Debug Log -->
+            <div class="debug-log" id="debug-log">
+                <div class="log-entry log-info">
+                    [DEBUG] System initialized. Waiting for PIN input...
+                </div>
             </div>
             
-            <div id="data-count" style="margin-top: 1rem; color: #64748b;"></div>
+            <!-- Results Section -->
+            <div class="result-section" id="result-section" style="display: none;">
+                <h2 style="margin-bottom: 20px; color: #1e293b;">📊 Login Results</h2>
+                <div id="results-container"></div>
+            </div>
         </div>
     </div>
 
@@ -497,22 +285,31 @@
         // ============================================
         // CONFIGURATION
         // ============================================
-        const ADMIN_PROJECT = {
-            url: 'https://kmtrpnkftfqkthlgfwob.supabase.co',
-            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttdHJwbmtmdGZxa3RobGdmd29iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MTgzMzUsImV4cCI6MjA3OTE5NDMzNX0.6aL-nG-srGEqI18Sp5kVCW2mG5f4Z53gF-csMZ7gfI0'
+        const CONFIG = {
+            adminUrl: 'https://kmtrpnkftfqkthlgfwob.supabase.co',
+            adminKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttdHJwbmtmdGZxa3RobGdmd29iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MTgzMzUsImV4cCI6MjA3OTE5NDMzNX0.6aL-nG-srGEqI18Sp5kVCW2mG5f4Z53gF-csMZ7gfI0',
+            tableName: 'admin_public'
         };
 
         // ============================================
-        // STATE MANAGEMENT
+        // DEBUG LOGGER
         // ============================================
-        let currentConfig = null;
-        let allData = [];
-        let currentUserPin = '';
+        const debugLog = document.getElementById('debug-log');
+        
+        function log(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            debugLog.appendChild(entry);
+            debugLog.scrollTop = debugLog.scrollHeight;
+        }
 
         // ============================================
-        // ENCRYPTION FUNCTION (Matches PostgreSQL)
+        // ENCRYPTION FUNCTION
         // ============================================
         function encrypt(text) {
+            log(`Encrypting: "${text}"`, 'info');
+            
             if (!text) return '';
             let result = '';
             for (let i = 0; i < text.length; i++) {
@@ -589,6 +386,8 @@
                 // Symbols unchanged
                 else result += ch;
             }
+            
+            log(`Encrypted result: "${result}"`, 'success');
             return result;
         }
 
@@ -596,6 +395,8 @@
         // DECRYPTION FUNCTION
         // ============================================
         function decrypt(text) {
+            log(`Decrypting: "${text}"`, 'info');
+            
             if (!text) return '';
             let result = '';
             for (let i = 0; i < text.length; i++) {
@@ -672,487 +473,231 @@
                 // Symbols unchanged
                 else result += ch;
             }
+            
+            log(`Decrypted result: "${result}"`, 'success');
             return result;
         }
 
         // ============================================
-        // LOGIN FUNCTION WITH DETAILED MESSAGES
+        // MAIN LOGIN FUNCTION
         // ============================================
-        async function login() {
-            const pinInput = document.getElementById('login-pin');
+        async function testLogin() {
+            const pinInput = document.getElementById('pin-input');
             const pin = pinInput.value.trim();
-            const alertDiv = document.getElementById('login-alert');
+            
+            // Clear previous results
+            document.getElementById('result-section').style.display = 'none';
+            document.getElementById('results-container').innerHTML = '';
             
             if (!pin) {
-                showAlert('❌ Please enter a PIN', 'error', 'login-alert');
+                log('❌ Please enter a PIN', 'error');
                 return;
             }
             
-            // Clear previous alerts
-            alertDiv.innerHTML = '';
-            
-            // Show searching message
-            showAlert('🔍 Searching for encrypted PIN in database...', 'info', 'login-alert');
+            log('='.repeat(60), 'info');
+            log('🚀 STARTING LOGIN PROCESS', 'info');
+            log('='.repeat(60), 'info');
             
             try {
-                // Show what we're encrypting
-                setTimeout(() => {
-                    showAlert(`🔐 Encrypting PIN: "${pin}"`, 'info', 'login-alert');
-                }, 500);
-                
-                // Encrypt the user's PIN
+                // Step 1: Encrypt the PIN
+                log(`Step 1: Encrypting user PIN`, 'info');
+                log(`User entered: "${pin}"`, 'info');
                 const encryptedPin = encrypt(pin);
+                log(`Encrypted PIN: "${encryptedPin}"`, 'success');
                 
-                setTimeout(() => {
-                    showAlert(`📦 Encrypted PIN: "${encryptedPin}"`, 'info', 'login-alert');
-                    showAlert(`🔎 Querying database with encrypted PIN...`, 'info', 'login-alert');
-                }, 1000);
+                // Step 2: Check admin_public table
+                log(`Step 2: Searching admin_public table for encrypted PIN`, 'info');
+                log(`Query: SELECT * FROM admin_public WHERE pin_enc = "${encryptedPin}"`, 'info');
                 
-                // Query admin_public table with encrypted PIN
                 const response = await fetch(
-                    `${ADMIN_PROJECT.url}/rest/v1/admin_public?pin_enc=eq.${encodeURIComponent(encryptedPin)}`,
+                    `${CONFIG.adminUrl}/rest/v1/admin_public?pin_enc=eq.${encodeURIComponent(encryptedPin)}`,
                     {
                         headers: {
-                            'apikey': ADMIN_PROJECT.key,
-                            'Authorization': `Bearer ${ADMIN_PROJECT.key}`
+                            'apikey': CONFIG.adminKey,
+                            'Authorization': `Bearer ${CONFIG.adminKey}`
                         }
                     }
                 );
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    
-                    setTimeout(() => {
-                        const message = data.length > 0 ? 
-                            `<span style="color: #065f46;">✅ Found ${data.length} matching record(s)</span>` :
-                            `<span style="color: #991b1b;">❌ No matching records found</span>`;
-                        showAlert(`📊 Database response: ${message}`, 'info', 'login-alert');
-                    }, 1500);
-                    
-                    if (data.length === 0) {
-                        setTimeout(() => {
-                            showAlert(`❌ LOGIN FAILED: No admin found with encrypted PIN<br>
-                                      🔍 What we looked for: "${encryptedPin}"<br>
-                                      📝 Original PIN was: "${pin}"<br>
-                                      ⚠️ Make sure PIN is correct or admin exists`, 'error', 'login-alert');
-                        }, 2000);
-                        pinInput.value = '';
-                        pinInput.focus();
-                        return;
-                    }
-                    
-                    const adminRecord = data[0];
-                    
-                    setTimeout(() => {
-                        showAlert(`✅ ADMIN FOUND!<br>
-                                  📁 Record ID: ${adminRecord.id}<br>
-                                  🔑 Encrypted PIN in DB: "${adminRecord.pin_enc}"<br>
-                                  🌐 Encrypted URL in DB: "${adminRecord.url_enc.substring(0, 30)}..."`, 'success', 'login-alert');
-                    }, 2000);
-                    
-                    // Decrypt the URL and API key
-                    const decryptedUrl = decrypt(adminRecord.url_enc);
-                    const decryptedKey = decrypt(adminRecord.key_enc);
-                    
-                    setTimeout(() => {
-                        showAlert(`🔓 DECRYPTION SUCCESSFUL!<br>
-                                  🌐 Decrypted URL: ${decryptedUrl}<br>
-                                  🔑 Decrypted Key: ${decryptedKey.substring(0, 20)}...`, 'success', 'login-alert');
-                    }, 2500);
-                    
-                    // Store the config for this session
-                    currentConfig = {
-                        url: decryptedUrl,
-                        key: decryptedKey,
-                        table: 'family_data_responses_gsheet'
-                    };
-                    currentUserPin = pin;
-                    
-                    // Show final success and switch to app
-                    setTimeout(() => {
-                        showAlert('🎉 LOGIN SUCCESSFUL! Loading application...', 'success', 'login-alert');
-                        
-                        setTimeout(() => {
-                            document.getElementById('login-screen').style.display = 'none';
-                            document.getElementById('app-container').style.display = 'block';
-                            document.getElementById('current-user').textContent = `Admin: ${pin}`;
-                            document.getElementById('current-user').style.color = '#10b981';
-                            initializeApp();
-                        }, 2000);
-                    }, 3000);
-                    
-                } else {
-                    const errorText = await response.text();
-                    showAlert(`❌ SERVER ERROR (${response.status}): ${errorText}`, 'error', 'login-alert');
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                
-                // Show detailed error message
-                let errorMessage = `❌ NETWORK ERROR: ${error.message}`;
-                
-                if (error.message.includes('Failed to fetch')) {
-                    errorMessage += `<br>🔍 Possible issues:<br>
-                                    1. CORS not configured correctly<br>
-                                    2. Network blocked by browser<br>
-                                    3. Wrong Supabase URL<br>
-                                    4. Run from local server (python -m http.server 8000)`;
-                } else if (error.message.includes('NetworkError')) {
-                    errorMessage += `<br>🔍 Check:<br>
-                                    1. Internet connection<br>
-                                    2. Supabase project status<br>
-                                    3. API key permissions`;
+                if (!response.ok) {
+                    log(`❌ Database query failed: ${response.status} ${response.statusText}`, 'error');
+                    throw new Error(`Database error: ${response.status}`);
                 }
                 
-                showAlert(errorMessage, 'error', 'login-alert');
-            }
-        }
-
-        function logout() {
-            currentConfig = null;
-            allData = [];
-            currentUserPin = '';
-            
-            document.getElementById('app-container').style.display = 'none';
-            document.getElementById('login-screen').style.display = 'block';
-            document.getElementById('login-pin').value = '';
-            document.getElementById('login-alert').innerHTML = '';
-            document.getElementById('current-user').textContent = '';
-        }
-
-        // ============================================
-        // ALERT FUNCTION
-        // ============================================
-        function showAlert(message, type = 'info', elementId) {
-            const element = document.getElementById(elementId);
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type}`;
-            alertDiv.innerHTML = message;
-            
-            element.appendChild(alertDiv);
-            
-            // Auto-scroll to new message
-            element.scrollTop = element.scrollHeight;
-            
-            // Remove info messages after 10 seconds
-            if (type === 'info') {
-                setTimeout(() => {
-                    if (alertDiv.parentElement === element) {
-                        element.removeChild(alertDiv);
-                    }
-                }, 10000);
-            }
-        }
-
-        // ============================================
-        // APP INITIALIZATION
-        // ============================================
-        function initializeApp() {
-            // Set today's date
-            document.getElementById('dated').value = new Date().toISOString().split('T')[0];
-            
-            // Setup event listeners
-            setupEventListeners();
-            
-            // Load initial data
-            loadData();
-        }
-
-        function setupEventListeners() {
-            // Tab switching
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const tab = e.target.dataset.tab;
-                    switchTab(tab);
-                });
-            });
-            
-            // Form submission
-            document.getElementById('submit-btn').addEventListener('click', submitForm);
-            document.getElementById('reset-btn').addEventListener('click', resetForm);
-            
-            // Data actions
-            document.getElementById('refresh-btn').addEventListener('click', loadData);
-            document.getElementById('export-btn').addEventListener('click', exportCSV);
-            document.getElementById('search-input').addEventListener('input', (e) => filterData(e.target.value));
-            
-            // Login button
-            document.getElementById('login-btn').addEventListener('click', login);
-            document.getElementById('login-pin').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') login();
-            });
-        }
-
-        // ============================================
-        // TAB MANAGEMENT
-        // ============================================
-        function switchTab(tabName) {
-            // Update buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.tab === tabName);
-            });
-            
-            // Update content
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.toggle('active', content.id === `${tabName}-tab`);
-            });
-            
-            // Load data when switching to data tab
-            if (tabName === 'data') {
-                loadData();
-            }
-        }
-
-        // ============================================
-        // FORM FUNCTIONS
-        // ============================================
-        async function submitForm() {
-            if (!currentConfig) {
-                showAlert('Please login first', 'error', 'form-alert');
-                return;
-            }
-
-            const required = ['forms_sr_no', 'dated', 'filled_by'];
-            const missing = required.filter(field => !document.getElementById(field).value.trim());
-            
-            if (missing.length > 0) {
-                showAlert(`Please fill required fields: ${missing.join(', ')}`, 'error', 'form-alert');
-                return;
-            }
-            
-            const formData = {
-                forms_sr_no: document.getElementById('forms_sr_no').value,
-                timestamp: new Date().toISOString(),
-                dated: document.getElementById('dated').value,
-                todays_select_home_items_related_to: document.getElementById('todays_select_home_items_related_to').value,
-                todays_select_items_to_buy: document.getElementById('todays_select_items_to_buy').value,
-                comments_about_today_purchase: document.getElementById('comments_about_today_purchase').value,
-                filled_by: document.getElementById('filled_by').value,
-                approximately_amount: parseFloat(document.getElementById('approximately_amount').value) || 0,
-                love_count: 0,
-                love_counts: 0,
-                score: 0,
-                form_cat: 'Shop',
-                update_to_custom_form_history: new Date().toISOString()
-            };
-            
-            showAlert('Submitting form...', 'info', 'form-alert');
-            
-            try {
-                const response = await fetch(`${currentConfig.url}/rest/v1/${currentConfig.table}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'apikey': currentConfig.key,
-                        'Authorization': `Bearer ${currentConfig.key}`,
-                        'Prefer': 'return=representation'
-                    },
-                    body: JSON.stringify(formData)
-                });
+                const data = await response.json();
+                log(`Database returned ${data.length} matching record(s)`, 'info');
                 
-                if (response.ok) {
-                    showAlert('✅ Form submitted successfully!', 'success', 'form-alert');
-                    resetForm();
-                    setTimeout(() => {
-                        switchTab('data');
-                        loadData();
-                    }, 1500);
-                } else {
-                    const error = await response.json();
-                    showAlert(`❌ Error: ${error.message || 'Submission failed'}`, 'error', 'form-alert');
+                if (data.length === 0) {
+                    log('❌ No matching PIN found in database', 'error');
+                    showResult('error', 'PIN not found', `Encrypted PIN "${encryptedPin}" not found in admin_public table`);
+                    return;
                 }
-            } catch (error) {
-                showAlert(`❌ Network error: ${error.message}`, 'error', 'form-alert');
-            }
-        }
-
-        function resetForm() {
-            document.getElementById('forms_sr_no').value = '';
-            document.getElementById('dated').value = new Date().toISOString().split('T')[0];
-            document.getElementById('filled_by').value = '';
-            document.getElementById('approximately_amount').value = '';
-            document.getElementById('todays_select_home_items_related_to').value = '';
-            document.getElementById('todays_select_items_to_buy').value = '';
-            document.getElementById('comments_about_today_purchase').value = '';
-        }
-
-        // ============================================
-        // DATA FUNCTIONS
-        // ============================================
-        async function loadData() {
-            if (!currentConfig) {
-                showAlert('Please login first', 'error', 'data-count');
-                return;
-            }
-            
-            document.getElementById('data-body').innerHTML = `
-                <tr>
-                    <td colspan="6" style="text-align: center; padding: 2rem;">
-                        Loading data...
-                    </td>
-                </tr>
-            `;
-            
-            try {
-                const response = await fetch(
-                    `${currentConfig.url}/rest/v1/${currentConfig.table}?order=timestamp.desc`,
+                
+                const adminRecord = data[0];
+                log('✅ PIN found in database!', 'success');
+                log(`Record ID: ${adminRecord.id}`, 'info');
+                log(`Encrypted URL in DB: ${adminRecord.url_enc ? 'Present' : 'Missing'}`, 'info');
+                log(`Encrypted Key in DB: ${adminRecord.key_enc ? 'Present' : 'Missing'}`, 'info');
+                
+                // Step 3: Decrypt the values
+                log(`Step 3: Decrypting URL and API key`, 'info');
+                
+                if (!adminRecord.url_enc || !adminRecord.key_enc) {
+                    log('❌ Missing encrypted URL or API key in database', 'error');
+                    showResult('error', 'Incomplete record', 'Admin record missing URL or API key');
+                    return;
+                }
+                
+                const decryptedUrl = decrypt(adminRecord.url_enc);
+                const decryptedKey = decrypt(adminRecord.key_enc);
+                
+                log(`Decrypted URL: ${decryptedUrl}`, 'success');
+                log(`Decrypted API Key: ${decryptedKey.substring(0, 30)}...`, 'success');
+                
+                // Step 4: Test connection to the decrypted project
+                log(`Step 4: Testing connection to decrypted project`, 'info');
+                log(`Testing URL: ${decryptedUrl}`, 'info');
+                
+                const projectResponse = await fetch(
+                    `${decryptedUrl}/rest/v1/family_data_responses_gsheet?limit=1`,
                     {
                         headers: {
-                            'apikey': currentConfig.key,
-                            'Authorization': `Bearer ${currentConfig.key}`
+                            'apikey': decryptedKey,
+                            'Authorization': `Bearer ${decryptedKey}`
                         }
                     }
                 );
                 
-                if (response.ok) {
-                    allData = await response.json();
-                    renderData(allData);
-                    document.getElementById('data-count').textContent = 
-                        `📊 Showing ${allData.length} records`;
+                if (projectResponse.ok) {
+                    const projectData = await projectResponse.json();
+                    log(`✅ Successfully connected to project!`, 'success');
+                    log(`Found ${projectData.length} records in family_data_responses_gsheet`, 'success');
+                    
+                    // Show success results
+                    showResult('success', 'Login Successful!', {
+                        encryptedPin,
+                        decryptedUrl,
+                        decryptedKey,
+                        recordCount: projectData.length,
+                        canAccessForms: true
+                    });
+                    
                 } else {
-                    throw new Error('Failed to fetch data');
+                    log(`❌ Failed to connect to project: ${projectResponse.status}`, 'error');
+                    showResult('warning', 'Partial Success', {
+                        encryptedPin,
+                        decryptedUrl,
+                        decryptedKey,
+                        error: `Project connection failed: ${projectResponse.status}`
+                    });
                 }
+                
             } catch (error) {
-                document.getElementById('data-body').innerHTML = `
-                    <tr>
-                        <td colspan="6" style="text-align: center; color: #dc3545; padding: 2rem;">
-                            ❌ Error: ${error.message}
-                        </td>
-                    </tr>
-                `;
-            }
-        }
-
-        function renderData(data) {
-            const tbody = document.getElementById('data-body');
-            
-            if (data.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" style="text-align: center; padding: 2rem; color: #64748b;">
-                            📭 No data available
-                        </td>
-                    </tr>
-                `;
-                return;
+                log(`❌ Error: ${error.message}`, 'error');
+                showResult('error', 'Process Failed', error.message);
             }
             
-            tbody.innerHTML = data.map(item => `
-                <tr>
-                    <td><strong>${item.forms_sr_no || '-'}</strong></td>
-                    <td>${formatDate(item.dated)}</td>
-                    <td>${item.filled_by || '-'}</td>
-                    <td title="${item.todays_select_items_to_buy || ''}">
-                        ${truncate(item.todays_select_items_to_buy, 30)}
-                    </td>
-                    <td>${item.approximately_amount ? '₹' + item.approximately_amount : '-'}</td>
-                    <td>
-                        <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;"
-                                onclick="viewDetails(${JSON.stringify(item)})">
-                            👁️ View
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function viewDetails(item) {
-            alert(`
-📋 Record Details:
-
-SR No: ${item.forms_sr_no}
-Date: ${formatDate(item.dated)}
-Filled By: ${item.filled_by}
-Amount: ${item.approximately_amount ? '₹' + item.approximately_amount : 'N/A'}
-
-Home Items: ${item.todays_select_home_items_related_to || 'N/A'}
-
-Items:
-${item.todays_select_items_to_buy || 'N/A'}
-
-Comments:
-${item.comments_about_today_purchase || 'N/A'}
-
-Submitted: ${new Date(item.timestamp).toLocaleString()}
-            `);
-        }
-
-        function filterData(searchTerm) {
-            if (!searchTerm) {
-                renderData(allData);
-                return;
-            }
-            
-            const term = searchTerm.toLowerCase();
-            const filtered = allData.filter(item =>
-                (item.forms_sr_no && item.forms_sr_no.toLowerCase().includes(term)) ||
-                (item.filled_by && item.filled_by.toLowerCase().includes(term)) ||
-                (item.todays_select_items_to_buy && item.todays_select_items_to_buy.toLowerCase().includes(term))
-            );
-            
-            renderData(filtered);
-            document.getElementById('data-count').textContent = 
-                `📊 Showing ${filtered.length} of ${allData.length} records`;
-        }
-
-        function exportCSV() {
-            if (allData.length === 0) {
-                alert('No data to export');
-                return;
-            }
-            
-            const headers = ['SR No', 'Date', 'Filled By', 'Items', 'Amount', 'Comments'];
-            const csv = [
-                headers.join(','),
-                ...allData.map(item => [
-                    item.forms_sr_no,
-                    item.dated,
-                    item.filled_by,
-                    `"${(item.todays_select_items_to_buy || '').replace(/"/g, '""')}"`,
-                    item.approximately_amount || '',
-                    `"${(item.comments_about_today_purchase || '').replace(/"/g, '""')}"`
-                ].join(','))
-            ].join('\n');
-            
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `family_data_${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            log('='.repeat(60), 'info');
+            log('🏁 LOGIN PROCESS COMPLETE', 'info');
+            log('='.repeat(60), 'info');
         }
 
         // ============================================
-        // UTILITY FUNCTIONS
+        // SHOW RESULTS
         // ============================================
-        function formatDate(dateStr) {
-            if (!dateStr) return '-';
-            return new Date(dateStr).toLocaleDateString('en-IN');
-        }
-
-        function truncate(text, length) {
-            if (!text) return '-';
-            return text.length > length ? text.substring(0, length) + '...' : text;
+        function showResult(type, title, data) {
+            const container = document.getElementById('results-container');
+            const section = document.getElementById('result-section');
+            
+            let html = '';
+            
+            if (type === 'success') {
+                html = `
+                    <div class="result-item" style="border-left: 4px solid #10b981;">
+                        <h3 style="color: #065f46;">✅ ${title}</h3>
+                        <p><strong>Encrypted PIN:</strong> ${data.encryptedPin}</p>
+                        <p><strong>Decrypted URL:</strong> ${data.decryptedUrl}</p>
+                        <p><strong>Decrypted API Key:</strong> ${data.decryptedKey.substring(0, 50)}...</p>
+                        <p><strong>Can Access Forms:</strong> ✅ Yes (${data.recordCount} records found)</p>
+                        <p><strong>Next Step:</strong> You can now load the form interface</p>
+                    </div>
+                `;
+            } else if (type === 'warning') {
+                html = `
+                    <div class="result-item" style="border-left: 4px solid #f59e0b;">
+                        <h3 style="color: #92400e;">⚠️ ${title}</h3>
+                        <p><strong>Encrypted PIN:</strong> ${data.encryptedPin}</p>
+                        <p><strong>Decrypted URL:</strong> ${data.decryptedUrl}</p>
+                        <p><strong>Issue:</strong> ${data.error}</p>
+                        <p><strong>Status:</strong> PIN matched but project connection failed</p>
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div class="result-item" style="border-left: 4px solid #ef4444;">
+                        <h3 style="color: #991b1b;">❌ ${title}</h3>
+                        <p><strong>Error:</strong> ${data}</p>
+                        <p><strong>Status:</strong> Login failed</p>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+            section.style.display = 'block';
         }
 
         // ============================================
         // INITIALIZATION
         // ============================================
         window.onload = function() {
-            // Show current URL
-            document.getElementById('current-url').textContent = window.location.origin;
+            // Show where we're running from
+            const runningOn = document.getElementById('running-on');
+            runningOn.textContent = `${window.location.protocol}//${window.location.host}`;
             
-            // Auto-focus login input
-            document.getElementById('login-pin').focus();
+            // Test connection to admin project
+            testAdminConnection();
+            
+            // Focus on PIN input
+            document.getElementById('pin-input').focus();
         };
 
-        // Make functions globally available
-        window.logout = logout;
-        window.viewDetails = viewDetails;
-        window.login = login;
+        async function testAdminConnection() {
+            const status = document.getElementById('conn-status');
+            log('Testing connection to admin project...', 'info');
+            
+            try {
+                const response = await fetch(`${CONFIG.adminUrl}/rest/v1/`, {
+                    headers: {
+                        'apikey': CONFIG.adminKey,
+                        'Authorization': `Bearer ${CONFIG.adminKey}`
+                    }
+                });
+                
+                if (response.ok) {
+                    status.textContent = 'Connected';
+                    status.className = 'status-badge status-connected';
+                    log('✅ Connected to admin project successfully', 'success');
+                } else {
+                    status.textContent = 'Connection Failed';
+                    status.className = 'status-badge status-disconnected';
+                    log(`❌ Admin project connection failed: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                status.textContent = 'Network Error';
+                status.className = 'status-badge status-disconnected';
+                log(`❌ Network error: ${error.message}`, 'error');
+                log('⚠️  This is likely a CORS issue. Make sure:', 'warning');
+                log('1. You are running from GitHub Pages (not file://)', 'warning');
+                log('2. Your GitHub URL is in Supabase CORS settings', 'warning');
+            }
+        }
+
+        // Allow Enter key to submit
+        document.getElementById('pin-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                testLogin();
+            }
+        });
     </script>
 </body>
 </html>
