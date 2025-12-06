@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Supabase Connection</title>
+</head>
+<body>
+    <h2>Testing Supabase Connection from GitHub Pages</h2>
+    <div id="status">Testing...</div>
+    <div id="result"></div>
+    
+    <script>
+        // Replace these with your actual values
+        const SUPABASE_URL = 'https://kmtrpnkftfqkthlgfwob.supabase.co'; // e.g., https://xyzabc.supabase.co
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttdHJwbmtmdGZxa3RobGdmd29iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MTgzMzUsImV4cCI6MjA3OTE5NDMzNX0.6aL-nG-srGEqI18Sp5kVCW2mG5f4Z53gF-csMZ7gfI0'; // From Supabase Settings → API
+        const TABLE_NAME = 'family_data_responses_gsheet';
+        
+        async function testConnection() {
+            const status = document.getElementById('status');
+            const result = document.getElementById('result');
+            
+            try {
+                status.innerHTML = '🔍 Testing connection...';
+                
+                // Try to fetch one record
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}?limit=1`, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    status.innerHTML = '✅ Connection successful!';
+                    result.innerHTML = `
+                        <h3>✅ CORS is working!</h3>
+                        <p>Fetched ${data.length} record(s)</p>
+                        <p>Headers received:</p>
+                        <pre>Access-Control-Allow-Origin: ${response.headers.get('Access-Control-Allow-Origin') || 'Not found'}</pre>
+                        ${data.length > 0 ? `<p>First record SR No: ${data[0].forms_sr_no || 'N/A'}</p>` : ''}
+                    `;
+                    console.log('Success! Data:', data);
+                } else {
+                    status.innerHTML = '❌ Server error';
+                    const error = await response.text();
+                    result.innerHTML = `
+                        <h3>❌ Error ${response.status}</h3>
+                        <pre>${error}</pre>
+                    `;
+                    console.error('Server error:', error);
+                }
+            } catch (error) {
+                status.innerHTML = '❌ Network error';
+                result.innerHTML = `
+                    <h3>❌ Network Error</h3>
+                    <pre>${error.message}</pre>
+                    <p>Possible issues:</p>
+                    <ul>
+                        <li>CORS not configured correctly</li>
+                        <li>Wrong Supabase URL/Key</li>
+                        <li>Network blocked by browser</li>
+                    </ul>
+                `;
+                console.error('Network error:', error);
+            }
+        }
+        
+        // Run test when page loads
+        window.onload = testConnection;
+    </script>
+</body>
+</html>
