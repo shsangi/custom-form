@@ -1,74 +1,367 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Test Supabase Connection</title>
+    <title>PIN Login Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-case {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        input, button {
+            padding: 8px;
+            margin: 5px;
+        }
+    </style>
 </head>
 <body>
-    <h2>Testing Supabase Connection from GitHub Pages</h2>
-    <div id="status">Testing...</div>
-    <div id="result"></div>
+    <h2>🔐 PIN Login Test</h2>
     
+    <div class="test-case">
+        <h3>Test 1: Encryption Test</h3>
+        <input type="text" id="test-pin" placeholder="Enter PIN to test encryption">
+        <button onclick="testEncryption()">Test Encryption</button>
+        <div id="encryption-result"></div>
+    </div>
+    
+    <div class="test-case">
+        <h3>Test 2: Database Connection</h3>
+        <button onclick="testAdminConnection()">Test Admin Project Connection</button>
+        <div id="connection-result"></div>
+    </div>
+    
+    <div class="test-case">
+        <h3>Test 3: Full PIN Login</h3>
+        <input type="password" id="login-pin" placeholder="Enter your PIN">
+        <button onclick="testFullLogin()">Test Login</button>
+        <div id="login-result"></div>
+    </div>
+
     <script>
-        // Replace these with your actual values
-        const SUPABASE_URL = 'https://kmtrpnkftfqkthlgfwob.supabase.co'; // e.g., https://xyzabc.supabase.co
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttdHJwbmtmdGZxa3RobGdmd29iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MTgzMzUsImV4cCI6MjA3OTE5NDMzNX0.6aL-nG-srGEqI18Sp5kVCW2mG5f4Z53gF-csMZ7gfI0'; // From Supabase Settings → API
-        const TABLE_NAME = 'family_data_responses_gsheet';
-        
-        async function testConnection() {
-            const status = document.getElementById('status');
-            const result = document.getElementById('result');
+        // Admin project config
+        const ADMIN_PROJECT = {
+            url: 'https://kmtrpnob.supabase.co',
+            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttdHJwbmtmdGZxa3RobGdjE3NjM2M'
+        };
+
+        // Simple encryption function (same as in main app)
+        function encrypt(text) {
+            if (!text) return '';
+            let result = '';
+            for (let i = 0; i < text.length; i++) {
+                const ch = text[i];
+                
+                // Lowercase
+                if (ch === 'a') result += 'o';
+                else if (ch === 'b') result += 'k';
+                else if (ch === 'c') result += 'x';
+                else if (ch === 'd') result += 'z';
+                else if (ch === 'e') result += 'p';
+                else if (ch === 'f') result += 'q';
+                else if (ch === 'g') result += 'r';
+                else if (ch === 'h') result += 's';
+                else if (ch === 'i') result += 't';
+                else if (ch === 'j') result += 'u';
+                else if (ch === 'k') result += 'v';
+                else if (ch === 'l') result += 'w';
+                else if (ch === 'm') result += 'a';
+                else if (ch === 'n') result += 'b';
+                else if (ch === 'o') result += 'c';
+                else if (ch === 'p') result += 'd';
+                else if (ch === 'q') result += 'e';
+                else if (ch === 'r') result += 'f';
+                else if (ch === 's') result += 'g';
+                else if (ch === 't') result += 'h';
+                else if (ch === 'u') result += 'i';
+                else if (ch === 'v') result += 'j';
+                else if (ch === 'w') result += 'l';
+                else if (ch === 'x') result += 'm';
+                else if (ch === 'y') result += 'n';
+                else if (ch === 'z') result += 'y';
+                
+                // Uppercase
+                else if (ch === 'A') result += 'O';
+                else if (ch === 'B') result += 'K';
+                else if (ch === 'C') result += 'X';
+                else if (ch === 'D') result += 'Z';
+                else if (ch === 'E') result += 'P';
+                else if (ch === 'F') result += 'Q';
+                else if (ch === 'G') result += 'R';
+                else if (ch === 'H') result += 'S';
+                else if (ch === 'I') result += 'T';
+                else if (ch === 'J') result += 'U';
+                else if (ch === 'K') result += 'V';
+                else if (ch === 'L') result += 'W';
+                else if (ch === 'M') result += 'A';
+                else if (ch === 'N') result += 'B';
+                else if (ch === 'O') result += 'C';
+                else if (ch === 'P') result += 'D';
+                else if (ch === 'Q') result += 'E';
+                else if (ch === 'R') result += 'F';
+                else if (ch === 'S') result += 'G';
+                else if (ch === 'T') result += 'H';
+                else if (ch === 'U') result += 'I';
+                else if (ch === 'V') result += 'J';
+                else if (ch === 'W') result += 'L';
+                else if (ch === 'X') result += 'M';
+                else if (ch === 'Y') result += 'N';
+                else if (ch === 'Z') result += 'Y';
+                
+                // Digits
+                else if (ch === '0') result += '7';
+                else if (ch === '1') result += '8';
+                else if (ch === '2') result += '9';
+                else if (ch === '3') result += '4';
+                else if (ch === '4') result += '5';
+                else if (ch === '5') result += '6';
+                else if (ch === '6') result += '0';
+                else if (ch === '7') result += '1';
+                else if (ch === '8') result += '2';
+                else if (ch === '9') result += '3';
+                
+                // Symbols unchanged
+                else result += ch;
+            }
+            return result;
+        }
+
+        // Test 1: Encryption only
+        function testEncryption() {
+            const pin = document.getElementById('test-pin').value;
+            if (!pin) {
+                document.getElementById('encryption-result').innerHTML = 
+                    '<span class="error">Please enter a PIN</span>';
+                return;
+            }
+            
+            const encrypted = encrypt(pin);
+            document.getElementById('encryption-result').innerHTML = 
+                `<span class="success">✅ PIN: "${pin}" → Encrypted: "${encrypted}"</span>`;
+        }
+
+        // Test 2: Check if we can connect to admin project
+        async function testAdminConnection() {
+            const resultDiv = document.getElementById('connection-result');
+            resultDiv.innerHTML = 'Testing connection...';
             
             try {
-                status.innerHTML = '🔍 Testing connection...';
-                
-                // Try to fetch one record
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}?limit=1`, {
-                    method: 'GET',
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Content-Type': 'application/json'
+                const response = await fetch(
+                    `${ADMIN_PROJECT.url}/rest/v1/admin_public?limit=1`,
+                    {
+                        headers: {
+                            'apikey': ADMIN_PROJECT.key,
+                            'Authorization': `Bearer ${ADMIN_PROJECT.key}`
+                        }
                     }
-                });
+                );
                 
                 if (response.ok) {
                     const data = await response.json();
-                    status.innerHTML = '✅ Connection successful!';
-                    result.innerHTML = `
-                        <h3>✅ CORS is working!</h3>
-                        <p>Fetched ${data.length} record(s)</p>
-                        <p>Headers received:</p>
-                        <pre>Access-Control-Allow-Origin: ${response.headers.get('Access-Control-Allow-Origin') || 'Not found'}</pre>
-                        ${data.length > 0 ? `<p>First record SR No: ${data[0].forms_sr_no || 'N/A'}</p>` : ''}
-                    `;
-                    console.log('Success! Data:', data);
+                    resultDiv.innerHTML = `<span class="success">
+                        ✅ Connection successful!<br>
+                        Found ${data.length} records in admin_public table<br>
+                        First record PIN: ${data[0]?.pin_enc || 'None'}
+                    </span>`;
                 } else {
-                    status.innerHTML = '❌ Server error';
                     const error = await response.text();
-                    result.innerHTML = `
-                        <h3>❌ Error ${response.status}</h3>
-                        <pre>${error}</pre>
-                    `;
-                    console.error('Server error:', error);
+                    resultDiv.innerHTML = `<span class="error">
+                        ❌ Connection failed: ${response.status}<br>
+                        ${error}
+                    </span>`;
                 }
             } catch (error) {
-                status.innerHTML = '❌ Network error';
-                result.innerHTML = `
-                    <h3>❌ Network Error</h3>
-                    <pre>${error.message}</pre>
-                    <p>Possible issues:</p>
-                    <ul>
-                        <li>CORS not configured correctly</li>
-                        <li>Wrong Supabase URL/Key</li>
-                        <li>Network blocked by browser</li>
-                    </ul>
-                `;
-                console.error('Network error:', error);
+                resultDiv.innerHTML = `<span class="error">
+                    ❌ Network error: ${error.message}<br>
+                    Check: CORS settings, URL, API key
+                </span>`;
             }
         }
-        
-        // Run test when page loads
-        window.onload = testConnection;
+
+        // Test 3: Full login test
+        async function testFullLogin() {
+            const pin = document.getElementById('login-pin').value;
+            const resultDiv = document.getElementById('login-result');
+            
+            if (!pin) {
+                resultDiv.innerHTML = '<span class="error">Please enter a PIN</span>';
+                return;
+            }
+            
+            resultDiv.innerHTML = 'Testing login...';
+            
+            try {
+                // Encrypt PIN
+                const encryptedPin = encrypt(pin);
+                console.log(`Testing PIN: "${pin}" → Encrypted: "${encryptedPin}"`);
+                
+                // Check in admin_public table
+                const response = await fetch(
+                    `${ADMIN_PROJECT.url}/rest/v1/admin_public?pin_enc=eq.${encodeURIComponent(encryptedPin)}`,
+                    {
+                        headers: {
+                            'apikey': ADMIN_PROJECT.key,
+                            'Authorization': `Bearer ${ADMIN_PROJECT.key}`
+                        }
+                    }
+                );
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.length === 0) {
+                        resultDiv.innerHTML = `<span class="error">
+                            ❌ Invalid PIN<br>
+                            Encrypted PIN "${encryptedPin}" not found in database
+                        </span>`;
+                    } else {
+                        // Simple decryption for test
+                        function decrypt(text) {
+                            let result = '';
+                            for (let i = 0; i < text.length; i++) {
+                                const ch = text[i];
+                                if (ch === 'o') result += 'a';
+                                else if (ch === 'k') result += 'b';
+                                else if (ch === 'x') result += 'c';
+                                else if (ch === 'z') result += 'd';
+                                else if (ch === 'p') result += 'e';
+                                else if (ch === 'q') result += 'f';
+                                else if (ch === 'r') result += 'g';
+                                else if (ch === 's') result += 'h';
+                                else if (ch === 't') result += 'i';
+                                else if (ch === 'u') result += 'j';
+                                else if (ch === 'v') result += 'k';
+                                else if (ch === 'w') result += 'l';
+                                else if (ch === 'a') result += 'm';
+                                else if (ch === 'b') result += 'n';
+                                else if (ch === 'c') result += 'o';
+                                else if (ch === 'd') result += 'p';
+                                else if (ch === 'e') result += 'q';
+                                else if (ch === 'f') result += 'r';
+                                else if (ch === 'g') result += 's';
+                                else if (ch === 'h') result += 't';
+                                else if (ch === 'i') result += 'u';
+                                else if (ch === 'j') result += 'v';
+                                else if (ch === 'l') result += 'w';
+                                else if (ch === 'm') result += 'x';
+                                else if (ch === 'n') result += 'y';
+                                else if (ch === 'y') result += 'z';
+                                else if (ch === 'O') result += 'A';
+                                else if (ch === 'K') result += 'B';
+                                else if (ch === 'X') result += 'C';
+                                else if (ch === 'Z') result += 'D';
+                                else if (ch === 'P') result += 'E';
+                                else if (ch === 'Q') result += 'F';
+                                else if (ch === 'R') result += 'G';
+                                else if (ch === 'S') result += 'H';
+                                else if (ch === 'T') result += 'I';
+                                else if (ch === 'U') result += 'J';
+                                else if (ch === 'V') result += 'K';
+                                else if (ch === 'W') result += 'L';
+                                else if (ch === 'A') result += 'M';
+                                else if (ch === 'B') result += 'N';
+                                else if (ch === 'C') result += 'O';
+                                else if (ch === 'D') result += 'P';
+                                else if (ch === 'E') result += 'Q';
+                                else if (ch === 'F') result += 'R';
+                                else if (ch === 'G') result += 'S';
+                                else if (ch === 'H') result += 'T';
+                                else if (ch === 'I') result += 'U';
+                                else if (ch === 'J') result += 'V';
+                                else if (ch === 'L') result += 'W';
+                                else if (ch === 'M') result += 'X';
+                                else if (ch === 'N') result += 'Y';
+                                else if (ch === 'Y') result += 'Z';
+                                else if (ch === '7') result += '0';
+                                else if (ch === '8') result += '1';
+                                else if (ch === '9') result += '2';
+                                else if (ch === '4') result += '3';
+                                else if (ch === '5') result += '4';
+                                else if (ch === '6') result += '5';
+                                else if (ch === '0') result += '6';
+                                else if (ch === '1') result += '7';
+                                else if (ch === '2') result += '8';
+                                else if (ch === '3') result += '9';
+                                else result += ch;
+                            }
+                            return result;
+                        }
+                        
+                        const decryptedUrl = decrypt(data[0].url_enc);
+                        const decryptedKey = decrypt(data[0].key_enc);
+                        
+                        resultDiv.innerHTML = `<span class="success">
+                            ✅ LOGIN SUCCESSFUL!<br><br>
+                            <strong>Found Admin:</strong><br>
+                            • Encrypted PIN: ${data[0].pin_enc}<br>
+                            • Decrypted URL: ${decryptedUrl}<br>
+                            • Decrypted Key: ${decryptedKey.substring(0, 30)}...<br><br>
+                            <strong>Test Main Project Connection:</strong>
+                            <button onclick="testMainProject('${decryptedUrl}', '${decryptedKey}')">
+                                Test Main Project
+                            </button>
+                        </span>`;
+                    }
+                } else {
+                    const error = await response.text();
+                    resultDiv.innerHTML = `<span class="error">
+                        ❌ Server error: ${response.status}<br>
+                        ${error}
+                    </span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">
+                    ❌ Network error: ${error.message}
+                </span>`;
+            }
+        }
+
+        // Test main project connection
+        async function testMainProject(url, key) {
+            const resultDiv = document.getElementById('login-result');
+            resultDiv.innerHTML += '<br><br>Testing main project connection...';
+            
+            try {
+                const response = await fetch(
+                    `${url}/rest/v1/family_data_responses_gsheet?limit=1`,
+                    {
+                        headers: {
+                            'apikey': key,
+                            'Authorization': `Bearer ${key}`
+                        }
+                    }
+                );
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML += `<br><span class="success">
+                        ✅ Main project connected!<br>
+                        Found ${data.length} records in family_data_responses_gsheet
+                    </span>`;
+                } else {
+                    const error = await response.text();
+                    resultDiv.innerHTML += `<br><span class="error">
+                        ❌ Main project error: ${response.status}<br>
+                        ${error}
+                    </span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML += `<br><span class="error">
+                    ❌ Main project network error: ${error.message}
+                </span>`;
+            }
+        }
+
+        // Run connection test on page load
+        window.onload = testAdminConnection;
     </script>
 </body>
 </html>
