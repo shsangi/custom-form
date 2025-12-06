@@ -26,21 +26,30 @@
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             min-height: 100vh;
             padding: 1rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
         
+        /* Login Screen */
         .login-container {
             background: white;
             border-radius: 1rem;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             padding: 2rem;
-            width: 100%;
             max-width: 400px;
+            margin: 2rem auto;
             text-align: center;
+            animation: fadeIn 0.5s ease;
         }
         
+        .login-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .login-input {
+            margin: 1.5rem 0;
+        }
+        
+        /* Main App */
         .app-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -48,7 +57,7 @@
             border-radius: 1rem;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
-            display: none; /* Hidden until login */
+            display: none;
         }
         
         header {
@@ -102,7 +111,7 @@
         
         .tab-content.active {
             display: block;
-            animation: fadeIn 0.5s;
+            animation: fadeIn 0.5s ease;
         }
         
         @keyframes fadeIn {
@@ -255,17 +264,22 @@
             color: #1e40af;
         }
         
-        .login-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
+        .logout-btn {
+            background: #64748b;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            cursor: pointer;
         }
         
-        .login-input {
-            margin: 1.5rem 0;
+        .logout-btn:hover {
+            background: #475569;
         }
         
         @media (max-width: 768px) {
-            .container, .login-container {
+            .app-container, .login-container {
                 margin: 0.5rem;
                 border-radius: 0.75rem;
             }
@@ -310,8 +324,8 @@
     </style>
 </head>
 <body>
-    <!-- LOGIN SCREEN -->
-    <div class="login-container" id="login-screen">
+    <!-- Login Screen -->
+    <div id="login-screen" class="login-container">
         <div class="login-icon">🔐</div>
         <h2>Family Data Manager</h2>
         <p style="color: #64748b; margin-bottom: 1.5rem;">Enter your PIN to access the system</p>
@@ -325,17 +339,25 @@
         </button>
         
         <div id="login-alert" style="margin-top: 1rem;"></div>
+        
+        <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e2e8f0;">
+            <p style="color: #94a3b8; font-size: 0.875rem;">
+                <strong>Admin Project:</strong> kmtrpnob.supabase.co<br>
+                <strong>Running from:</strong> <span id="current-url"></span>
+            </p>
+        </div>
     </div>
 
-    <!-- MAIN APP (HIDDEN UNTIL LOGIN) -->
-    <div class="app-container" id="app-container">
+    <!-- Main App -->
+    <div id="app-container" class="app-container">
         <header>
             <div class="logo">
                 <span>📊</span>
                 <span>Family Data Manager</span>
             </div>
-            <div style="color: #cbd5e1; font-size: 0.9rem;">
-                <button class="btn" onclick="logout()" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <span style="color: #cbd5e1; font-size: 0.9rem;" id="current-user"></span>
+                <button class="logout-btn" onclick="logout()">
                     👋 Logout
                 </button>
             </div>
@@ -428,11 +450,7 @@
                         </tr>
                     </thead>
                     <tbody id="data-body">
-                        <tr>
-                            <td colspan="6" style="text-align: center; padding: 2rem;">
-                                Loading data...
-                            </td>
-                        </tr>
+                        <!-- Data will load here -->
                     </tbody>
                 </table>
             </div>
@@ -443,176 +461,7 @@
 
     <script>
         // ============================================
-        // ENCRYPTION LOGIC (Matches PostgreSQL function)
-        // ============================================
-        class Encryption {
-            static encrypt(text) {
-                if (!text) return '';
-                
-                let result = '';
-                for (let i = 0; i < text.length; i++) {
-                    const ch = text[i];
-                    
-                    // Lowercase
-                    if (ch === 'a') result += 'o';
-                    else if (ch === 'b') result += 'k';
-                    else if (ch === 'c') result += 'x';
-                    else if (ch === 'd') result += 'z';
-                    else if (ch === 'e') result += 'p';
-                    else if (ch === 'f') result += 'q';
-                    else if (ch === 'g') result += 'r';
-                    else if (ch === 'h') result += 's';
-                    else if (ch === 'i') result += 't';
-                    else if (ch === 'j') result += 'u';
-                    else if (ch === 'k') result += 'v';
-                    else if (ch === 'l') result += 'w';
-                    else if (ch === 'm') result += 'a';
-                    else if (ch === 'n') result += 'b';
-                    else if (ch === 'o') result += 'c';
-                    else if (ch === 'p') result += 'd';
-                    else if (ch === 'q') result += 'e';
-                    else if (ch === 'r') result += 'f';
-                    else if (ch === 's') result += 'g';
-                    else if (ch === 't') result += 'h';
-                    else if (ch === 'u') result += 'i';
-                    else if (ch === 'v') result += 'j';
-                    else if (ch === 'w') result += 'l';
-                    else if (ch === 'x') result += 'm';
-                    else if (ch === 'y') result += 'n';
-                    else if (ch === 'z') result += 'y';
-                    
-                    // Uppercase
-                    else if (ch === 'A') result += 'O';
-                    else if (ch === 'B') result += 'K';
-                    else if (ch === 'C') result += 'X';
-                    else if (ch === 'D') result += 'Z';
-                    else if (ch === 'E') result += 'P';
-                    else if (ch === 'F') result += 'Q';
-                    else if (ch === 'G') result += 'R';
-                    else if (ch === 'H') result += 'S';
-                    else if (ch === 'I') result += 'T';
-                    else if (ch === 'J') result += 'U';
-                    else if (ch === 'K') result += 'V';
-                    else if (ch === 'L') result += 'W';
-                    else if (ch === 'M') result += 'A';
-                    else if (ch === 'N') result += 'B';
-                    else if (ch === 'O') result += 'C';
-                    else if (ch === 'P') result += 'D';
-                    else if (ch === 'Q') result += 'E';
-                    else if (ch === 'R') result += 'F';
-                    else if (ch === 'S') result += 'G';
-                    else if (ch === 'T') result += 'H';
-                    else if (ch === 'U') result += 'I';
-                    else if (ch === 'V') result += 'J';
-                    else if (ch === 'W') result += 'L';
-                    else if (ch === 'X') result += 'M';
-                    else if (ch === 'Y') result += 'N';
-                    else if (ch === 'Z') result += 'Y';
-                    
-                    // Digits
-                    else if (ch === '0') result += '7';
-                    else if (ch === '1') result += '8';
-                    else if (ch === '2') result += '9';
-                    else if (ch === '3') result += '4';
-                    else if (ch === '4') result += '5';
-                    else if (ch === '5') result += '6';
-                    else if (ch === '6') result += '0';
-                    else if (ch === '7') result += '1';
-                    else if (ch === '8') result += '2';
-                    else if (ch === '9') result += '3';
-                    
-                    // Symbols unchanged
-                    else result += ch;
-                }
-                
-                return result;
-            }
-            
-            static decrypt(text) {
-                if (!text) return '';
-                
-                let result = '';
-                for (let i = 0; i < text.length; i++) {
-                    const ch = text[i];
-                    
-                    // Reverse lowercase
-                    if (ch === 'o') result += 'a';
-                    else if (ch === 'k') result += 'b';
-                    else if (ch === 'x') result += 'c';
-                    else if (ch === 'z') result += 'd';
-                    else if (ch === 'p') result += 'e';
-                    else if (ch === 'q') result += 'f';
-                    else if (ch === 'r') result += 'g';
-                    else if (ch === 's') result += 'h';
-                    else if (ch === 't') result += 'i';
-                    else if (ch === 'u') result += 'j';
-                    else if (ch === 'v') result += 'k';
-                    else if (ch === 'w') result += 'l';
-                    else if (ch === 'a') result += 'm';
-                    else if (ch === 'b') result += 'n';
-                    else if (ch === 'c') result += 'o';
-                    else if (ch === 'd') result += 'p';
-                    else if (ch === 'e') result += 'q';
-                    else if (ch === 'f') result += 'r';
-                    else if (ch === 'g') result += 's';
-                    else if (ch === 'h') result += 't';
-                    else if (ch === 'i') result += 'u';
-                    else if (ch === 'j') result += 'v';
-                    else if (ch === 'l') result += 'w';
-                    else if (ch === 'm') result += 'x';
-                    else if (ch === 'n') result += 'y';
-                    else if (ch === 'y') result += 'z';
-                    
-                    // Reverse uppercase
-                    else if (ch === 'O') result += 'A';
-                    else if (ch === 'K') result += 'B';
-                    else if (ch === 'X') result += 'C';
-                    else if (ch === 'Z') result += 'D';
-                    else if (ch === 'P') result += 'E';
-                    else if (ch === 'Q') result += 'F';
-                    else if (ch === 'R') result += 'G';
-                    else if (ch === 'S') result += 'H';
-                    else if (ch === 'T') result += 'I';
-                    else if (ch === 'U') result += 'J';
-                    else if (ch === 'V') result += 'K';
-                    else if (ch === 'W') result += 'L';
-                    else if (ch === 'A') result += 'M';
-                    else if (ch === 'B') result += 'N';
-                    else if (ch === 'C') result += 'O';
-                    else if (ch === 'D') result += 'P';
-                    else if (ch === 'E') result += 'Q';
-                    else if (ch === 'F') result += 'R';
-                    else if (ch === 'G') result += 'S';
-                    else if (ch === 'H') result += 'T';
-                    else if (ch === 'I') result += 'U';
-                    else if (ch === 'J') result += 'V';
-                    else if (ch === 'L') result += 'W';
-                    else if (ch === 'M') result += 'X';
-                    else if (ch === 'N') result += 'Y';
-                    else if (ch === 'Y') result += 'Z';
-                    
-                    // Reverse digits
-                    else if (ch === '7') result += '0';
-                    else if (ch === '8') result += '1';
-                    else if (ch === '9') result += '2';
-                    else if (ch === '4') result += '3';
-                    else if (ch === '5') result += '4';
-                    else if (ch === '6') result += '5';
-                    else if (ch === '0') result += '6';
-                    else if (ch === '1') result += '7';
-                    else if (ch === '2') result += '8';
-                    else if (ch === '3') result += '9';
-                    
-                    // Symbols unchanged
-                    else result += ch;
-                }
-                
-                return result;
-            }
-        }
-
-        // ============================================
-        // ADMIN PROJECT CONFIGURATION
+        // CONFIGURATION
         // ============================================
         const ADMIN_PROJECT = {
             url: 'https://kmtrpnkftfqkthlgfwob.supabase.co',
@@ -620,13 +469,180 @@
         };
 
         // ============================================
-        // APP STATE
+        // STATE MANAGEMENT
         // ============================================
         let currentConfig = null;
         let allData = [];
+        let currentUserPin = '';
 
         // ============================================
-        // LOGIN FUNCTION
+        // ENCRYPTION FUNCTION (Matches PostgreSQL)
+        // ============================================
+        function encrypt(text) {
+            if (!text) return '';
+            let result = '';
+            for (let i = 0; i < text.length; i++) {
+                const ch = text[i];
+                
+                // Lowercase
+                if (ch === 'a') result += 'o';
+                else if (ch === 'b') result += 'k';
+                else if (ch === 'c') result += 'x';
+                else if (ch === 'd') result += 'z';
+                else if (ch === 'e') result += 'p';
+                else if (ch === 'f') result += 'q';
+                else if (ch === 'g') result += 'r';
+                else if (ch === 'h') result += 's';
+                else if (ch === 'i') result += 't';
+                else if (ch === 'j') result += 'u';
+                else if (ch === 'k') result += 'v';
+                else if (ch === 'l') result += 'w';
+                else if (ch === 'm') result += 'a';
+                else if (ch === 'n') result += 'b';
+                else if (ch === 'o') result += 'c';
+                else if (ch === 'p') result += 'd';
+                else if (ch === 'q') result += 'e';
+                else if (ch === 'r') result += 'f';
+                else if (ch === 's') result += 'g';
+                else if (ch === 't') result += 'h';
+                else if (ch === 'u') result += 'i';
+                else if (ch === 'v') result += 'j';
+                else if (ch === 'w') result += 'l';
+                else if (ch === 'x') result += 'm';
+                else if (ch === 'y') result += 'n';
+                else if (ch === 'z') result += 'y';
+                
+                // Uppercase
+                else if (ch === 'A') result += 'O';
+                else if (ch === 'B') result += 'K';
+                else if (ch === 'C') result += 'X';
+                else if (ch === 'D') result += 'Z';
+                else if (ch === 'E') result += 'P';
+                else if (ch === 'F') result += 'Q';
+                else if (ch === 'G') result += 'R';
+                else if (ch === 'H') result += 'S';
+                else if (ch === 'I') result += 'T';
+                else if (ch === 'J') result += 'U';
+                else if (ch === 'K') result += 'V';
+                else if (ch === 'L') result += 'W';
+                else if (ch === 'M') result += 'A';
+                else if (ch === 'N') result += 'B';
+                else if (ch === 'O') result += 'C';
+                else if (ch === 'P') result += 'D';
+                else if (ch === 'Q') result += 'E';
+                else if (ch === 'R') result += 'F';
+                else if (ch === 'S') result += 'G';
+                else if (ch === 'T') result += 'H';
+                else if (ch === 'U') result += 'I';
+                else if (ch === 'V') result += 'J';
+                else if (ch === 'W') result += 'L';
+                else if (ch === 'X') result += 'M';
+                else if (ch === 'Y') result += 'N';
+                else if (ch === 'Z') result += 'Y';
+                
+                // Digits
+                else if (ch === '0') result += '7';
+                else if (ch === '1') result += '8';
+                else if (ch === '2') result += '9';
+                else if (ch === '3') result += '4';
+                else if (ch === '4') result += '5';
+                else if (ch === '5') result += '6';
+                else if (ch === '6') result += '0';
+                else if (ch === '7') result += '1';
+                else if (ch === '8') result += '2';
+                else if (ch === '9') result += '3';
+                
+                // Symbols unchanged
+                else result += ch;
+            }
+            return result;
+        }
+
+        // ============================================
+        // DECRYPTION FUNCTION
+        // ============================================
+        function decrypt(text) {
+            if (!text) return '';
+            let result = '';
+            for (let i = 0; i < text.length; i++) {
+                const ch = text[i];
+                
+                // Reverse lowercase
+                if (ch === 'o') result += 'a';
+                else if (ch === 'k') result += 'b';
+                else if (ch === 'x') result += 'c';
+                else if (ch === 'z') result += 'd';
+                else if (ch === 'p') result += 'e';
+                else if (ch === 'q') result += 'f';
+                else if (ch === 'r') result += 'g';
+                else if (ch === 's') result += 'h';
+                else if (ch === 't') result += 'i';
+                else if (ch === 'u') result += 'j';
+                else if (ch === 'v') result += 'k';
+                else if (ch === 'w') result += 'l';
+                else if (ch === 'a') result += 'm';
+                else if (ch === 'b') result += 'n';
+                else if (ch === 'c') result += 'o';
+                else if (ch === 'd') result += 'p';
+                else if (ch === 'e') result += 'q';
+                else if (ch === 'f') result += 'r';
+                else if (ch === 'g') result += 's';
+                else if (ch === 'h') result += 't';
+                else if (ch === 'i') result += 'u';
+                else if (ch === 'j') result += 'v';
+                else if (ch === 'l') result += 'w';
+                else if (ch === 'm') result += 'x';
+                else if (ch === 'n') result += 'y';
+                else if (ch === 'y') result += 'z';
+                
+                // Reverse uppercase
+                else if (ch === 'O') result += 'A';
+                else if (ch === 'K') result += 'B';
+                else if (ch === 'X') result += 'C';
+                else if (ch === 'Z') result += 'D';
+                else if (ch === 'P') result += 'E';
+                else if (ch === 'Q') result += 'F';
+                else if (ch === 'R') result += 'G';
+                else if (ch === 'S') result += 'H';
+                else if (ch === 'T') result += 'I';
+                else if (ch === 'U') result += 'J';
+                else if (ch === 'V') result += 'K';
+                else if (ch === 'W') result += 'L';
+                else if (ch === 'A') result += 'M';
+                else if (ch === 'B') result += 'N';
+                else if (ch === 'C') result += 'O';
+                else if (ch === 'D') result += 'P';
+                else if (ch === 'E') result += 'Q';
+                else if (ch === 'F') result += 'R';
+                else if (ch === 'G') result += 'S';
+                else if (ch === 'H') result += 'T';
+                else if (ch === 'I') result += 'U';
+                else if (ch === 'J') result += 'V';
+                else if (ch === 'L') result += 'W';
+                else if (ch === 'M') result += 'X';
+                else if (ch === 'N') result += 'Y';
+                else if (ch === 'Y') result += 'Z';
+                
+                // Reverse digits
+                else if (ch === '7') result += '0';
+                else if (ch === '8') result += '1';
+                else if (ch === '9') result += '2';
+                else if (ch === '4') result += '3';
+                else if (ch === '5') result += '4';
+                else if (ch === '6') result += '5';
+                else if (ch === '0') result += '6';
+                else if (ch === '1') result += '7';
+                else if (ch === '2') result += '8';
+                else if (ch === '3') result += '9';
+                
+                // Symbols unchanged
+                else result += ch;
+            }
+            return result;
+        }
+
+        // ============================================
+        // LOGIN/LOGOUT FUNCTIONS
         // ============================================
         async function login() {
             const pinInput = document.getElementById('login-pin');
@@ -634,15 +650,15 @@
             const alertDiv = document.getElementById('login-alert');
             
             if (!pin) {
-                alertDiv.innerHTML = '<div class="alert alert-error">Please enter a PIN</div>';
+                showAlert('Please enter a PIN', 'error', 'login-alert');
                 return;
             }
             
-            alertDiv.innerHTML = '<div class="alert alert-info">Verifying PIN...</div>';
+            showAlert('Verifying PIN...', 'info', 'login-alert');
             
             try {
                 // Encrypt the user's PIN
-                const encryptedPin = Encryption.encrypt(pin);
+                const encryptedPin = encrypt(pin);
                 
                 // Query admin_public table with encrypted PIN
                 const response = await fetch(
@@ -659,15 +675,15 @@
                     const data = await response.json();
                     
                     if (data.length === 0) {
-                        alertDiv.innerHTML = '<div class="alert alert-error">Invalid PIN</div>';
+                        showAlert('Invalid PIN', 'error', 'login-alert');
                         pinInput.value = '';
                         return;
                     }
                     
                     // Decrypt the URL and API key
                     const adminRecord = data[0];
-                    const decryptedUrl = Encryption.decrypt(adminRecord.url_enc);
-                    const decryptedKey = Encryption.decrypt(adminRecord.key_enc);
+                    const decryptedUrl = decrypt(adminRecord.url_enc);
+                    const decryptedKey = decrypt(adminRecord.key_enc);
                     
                     // Store the config for this session
                     currentConfig = {
@@ -675,13 +691,15 @@
                         key: decryptedKey,
                         table: 'family_data_responses_gsheet'
                     };
+                    currentUserPin = pin;
                     
                     // Show success and switch to app
-                    alertDiv.innerHTML = '<div class="alert alert-success">✅ Login successful! Loading app...</div>';
+                    showAlert('✅ Login successful! Loading app...', 'success', 'login-alert');
                     
                     setTimeout(() => {
                         document.getElementById('login-screen').style.display = 'none';
                         document.getElementById('app-container').style.display = 'block';
+                        document.getElementById('current-user').textContent = `User: ${pin}`;
                         initializeApp();
                     }, 1000);
                     
@@ -690,25 +708,24 @@
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                alertDiv.innerHTML = `<div class="alert alert-error">Login failed: ${error.message}</div>`;
+                showAlert(`Login failed: ${error.message}`, 'error', 'login-alert');
             }
         }
 
-        // ============================================
-        // LOGOUT FUNCTION
-        // ============================================
         function logout() {
             currentConfig = null;
             allData = [];
+            currentUserPin = '';
             
             document.getElementById('app-container').style.display = 'none';
             document.getElementById('login-screen').style.display = 'block';
             document.getElementById('login-pin').value = '';
             document.getElementById('login-alert').innerHTML = '';
+            document.getElementById('current-user').textContent = '';
         }
 
         // ============================================
-        // INITIALIZE APP AFTER LOGIN
+        // APP INITIALIZATION
         // ============================================
         function initializeApp() {
             // Set today's date
@@ -746,6 +763,9 @@
             });
         }
 
+        // ============================================
+        // TAB MANAGEMENT
+        // ============================================
         function switchTab(tabName) {
             // Update buttons
             document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -763,19 +783,9 @@
             }
         }
 
-        function showAlert(message, type = 'info', elementId) {
-            const element = document.getElementById(elementId);
-            element.innerHTML = `
-                <div class="alert alert-${type}">
-                    ${message}
-                </div>
-            `;
-            
-            if (type !== 'info') {
-                setTimeout(() => element.innerHTML = '', 5000);
-            }
-        }
-
+        // ============================================
+        // FORM FUNCTIONS
+        // ============================================
         async function submitForm() {
             if (!currentConfig) {
                 showAlert('Please login first', 'error', 'form-alert');
@@ -846,6 +856,9 @@
             document.getElementById('comments_about_today_purchase').value = '';
         }
 
+        // ============================================
+        // DATA FUNCTIONS
+        // ============================================
         async function loadData() {
             if (!currentConfig) {
                 showAlert('Please login first', 'error', 'data-count');
@@ -992,6 +1005,22 @@ Submitted: ${new Date(item.timestamp).toLocaleString()}
             URL.revokeObjectURL(url);
         }
 
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        function showAlert(message, type = 'info', elementId) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `
+                <div class="alert alert-${type}">
+                    ${message}
+                </div>
+            `;
+            
+            if (type !== 'info') {
+                setTimeout(() => element.innerHTML = '', 5000);
+            }
+        }
+
         function formatDate(dateStr) {
             if (!dateStr) return '-';
             return new Date(dateStr).toLocaleDateString('en-IN');
@@ -1002,10 +1031,21 @@ Submitted: ${new Date(item.timestamp).toLocaleString()}
             return text.length > length ? text.substring(0, length) + '...' : text;
         }
 
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        window.onload = function() {
+            // Show current URL
+            document.getElementById('current-url').textContent = window.location.origin;
+            
+            // Auto-focus login input
+            document.getElementById('login-pin').focus();
+        };
+
         // Make functions globally available
         window.logout = logout;
         window.viewDetails = viewDetails;
+        window.login = login;
     </script>
 </body>
 </html>
-
