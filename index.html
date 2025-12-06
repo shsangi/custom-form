@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Family Data Manager</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
     <style>
         :root {
             --primary: #667eea;
@@ -58,6 +57,62 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
             display: none;
+        }
+        
+        /* Alerts container */
+        #login-alert {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 1rem;
+            padding-right: 0.5rem;
+        }
+        
+        #login-alert .alert {
+            margin-bottom: 0.5rem;
+            animation: slideIn 0.3s ease;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            text-align: left;
+            line-height: 1.4;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Scrollbar styling */
+        #login-alert::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        #login-alert::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+        
+        #login-alert::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
         }
         
         header {
@@ -243,27 +298,6 @@
             background: #f1f5ff;
         }
         
-        .alert {
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin: 1rem 0;
-        }
-        
-        .alert-success {
-            background: #d1fae5;
-            color: #065f46;
-        }
-        
-        .alert-error {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-        
-        .alert-info {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-        
         .logout-btn {
             background: #64748b;
             color: white;
@@ -338,7 +372,7 @@
             🔑 Login
         </button>
         
-        <div id="login-alert" style="margin-top: 1rem;"></div>
+        <div id="login-alert"></div>
         
         <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e2e8f0;">
             <p style="color: #94a3b8; font-size: 0.875rem;">
@@ -642,7 +676,7 @@
         }
 
         // ============================================
-        // LOGIN/LOGOUT FUNCTIONS
+        // LOGIN FUNCTION WITH DETAILED MESSAGES
         // ============================================
         async function login() {
             const pinInput = document.getElementById('login-pin');
@@ -650,15 +684,29 @@
             const alertDiv = document.getElementById('login-alert');
             
             if (!pin) {
-                showAlert('Please enter a PIN', 'error', 'login-alert');
+                showAlert('❌ Please enter a PIN', 'error', 'login-alert');
                 return;
             }
             
-            showAlert('Verifying PIN...', 'info', 'login-alert');
+            // Clear previous alerts
+            alertDiv.innerHTML = '';
+            
+            // Show searching message
+            showAlert('🔍 Searching for encrypted PIN in database...', 'info', 'login-alert');
             
             try {
+                // Show what we're encrypting
+                setTimeout(() => {
+                    showAlert(`🔐 Encrypting PIN: "${pin}"`, 'info', 'login-alert');
+                }, 500);
+                
                 // Encrypt the user's PIN
                 const encryptedPin = encrypt(pin);
+                
+                setTimeout(() => {
+                    showAlert(`📦 Encrypted PIN: "${encryptedPin}"`, 'info', 'login-alert');
+                    showAlert(`🔎 Querying database with encrypted PIN...`, 'info', 'login-alert');
+                }, 1000);
                 
                 // Query admin_public table with encrypted PIN
                 const response = await fetch(
@@ -674,16 +722,43 @@
                 if (response.ok) {
                     const data = await response.json();
                     
+                    setTimeout(() => {
+                        const message = data.length > 0 ? 
+                            `<span style="color: #065f46;">✅ Found ${data.length} matching record(s)</span>` :
+                            `<span style="color: #991b1b;">❌ No matching records found</span>`;
+                        showAlert(`📊 Database response: ${message}`, 'info', 'login-alert');
+                    }, 1500);
+                    
                     if (data.length === 0) {
-                        showAlert('Invalid PIN', 'error', 'login-alert');
+                        setTimeout(() => {
+                            showAlert(`❌ LOGIN FAILED: No admin found with encrypted PIN<br>
+                                      🔍 What we looked for: "${encryptedPin}"<br>
+                                      📝 Original PIN was: "${pin}"<br>
+                                      ⚠️ Make sure PIN is correct or admin exists`, 'error', 'login-alert');
+                        }, 2000);
                         pinInput.value = '';
+                        pinInput.focus();
                         return;
                     }
                     
-                    // Decrypt the URL and API key
                     const adminRecord = data[0];
+                    
+                    setTimeout(() => {
+                        showAlert(`✅ ADMIN FOUND!<br>
+                                  📁 Record ID: ${adminRecord.id}<br>
+                                  🔑 Encrypted PIN in DB: "${adminRecord.pin_enc}"<br>
+                                  🌐 Encrypted URL in DB: "${adminRecord.url_enc.substring(0, 30)}..."`, 'success', 'login-alert');
+                    }, 2000);
+                    
+                    // Decrypt the URL and API key
                     const decryptedUrl = decrypt(adminRecord.url_enc);
                     const decryptedKey = decrypt(adminRecord.key_enc);
+                    
+                    setTimeout(() => {
+                        showAlert(`🔓 DECRYPTION SUCCESSFUL!<br>
+                                  🌐 Decrypted URL: ${decryptedUrl}<br>
+                                  🔑 Decrypted Key: ${decryptedKey.substring(0, 20)}...`, 'success', 'login-alert');
+                    }, 2500);
                     
                     // Store the config for this session
                     currentConfig = {
@@ -693,22 +768,43 @@
                     };
                     currentUserPin = pin;
                     
-                    // Show success and switch to app
-                    showAlert('✅ Login successful! Loading app...', 'success', 'login-alert');
-                    
+                    // Show final success and switch to app
                     setTimeout(() => {
-                        document.getElementById('login-screen').style.display = 'none';
-                        document.getElementById('app-container').style.display = 'block';
-                        document.getElementById('current-user').textContent = `User: ${pin}`;
-                        initializeApp();
-                    }, 1000);
+                        showAlert('🎉 LOGIN SUCCESSFUL! Loading application...', 'success', 'login-alert');
+                        
+                        setTimeout(() => {
+                            document.getElementById('login-screen').style.display = 'none';
+                            document.getElementById('app-container').style.display = 'block';
+                            document.getElementById('current-user').textContent = `Admin: ${pin}`;
+                            document.getElementById('current-user').style.color = '#10b981';
+                            initializeApp();
+                        }, 2000);
+                    }, 3000);
                     
                 } else {
-                    throw new Error('Server error');
+                    const errorText = await response.text();
+                    showAlert(`❌ SERVER ERROR (${response.status}): ${errorText}`, 'error', 'login-alert');
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                showAlert(`Login failed: ${error.message}`, 'error', 'login-alert');
+                
+                // Show detailed error message
+                let errorMessage = `❌ NETWORK ERROR: ${error.message}`;
+                
+                if (error.message.includes('Failed to fetch')) {
+                    errorMessage += `<br>🔍 Possible issues:<br>
+                                    1. CORS not configured correctly<br>
+                                    2. Network blocked by browser<br>
+                                    3. Wrong Supabase URL<br>
+                                    4. Run from local server (python -m http.server 8000)`;
+                } else if (error.message.includes('NetworkError')) {
+                    errorMessage += `<br>🔍 Check:<br>
+                                    1. Internet connection<br>
+                                    2. Supabase project status<br>
+                                    3. API key permissions`;
+                }
+                
+                showAlert(errorMessage, 'error', 'login-alert');
             }
         }
 
@@ -722,6 +818,30 @@
             document.getElementById('login-pin').value = '';
             document.getElementById('login-alert').innerHTML = '';
             document.getElementById('current-user').textContent = '';
+        }
+
+        // ============================================
+        // ALERT FUNCTION
+        // ============================================
+        function showAlert(message, type = 'info', elementId) {
+            const element = document.getElementById(elementId);
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = message;
+            
+            element.appendChild(alertDiv);
+            
+            // Auto-scroll to new message
+            element.scrollTop = element.scrollHeight;
+            
+            // Remove info messages after 10 seconds
+            if (type === 'info') {
+                setTimeout(() => {
+                    if (alertDiv.parentElement === element) {
+                        element.removeChild(alertDiv);
+                    }
+                }, 10000);
+            }
         }
 
         // ============================================
@@ -1008,19 +1128,6 @@ Submitted: ${new Date(item.timestamp).toLocaleString()}
         // ============================================
         // UTILITY FUNCTIONS
         // ============================================
-        function showAlert(message, type = 'info', elementId) {
-            const element = document.getElementById(elementId);
-            element.innerHTML = `
-                <div class="alert alert-${type}">
-                    ${message}
-                </div>
-            `;
-            
-            if (type !== 'info') {
-                setTimeout(() => element.innerHTML = '', 5000);
-            }
-        }
-
         function formatDate(dateStr) {
             if (!dateStr) return '-';
             return new Date(dateStr).toLocaleDateString('en-IN');
