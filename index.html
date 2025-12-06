@@ -1,74 +1,840 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Test Supabase Connection</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Data Manager</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #1e293b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--dark);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f1f5f9;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .tab-btn {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab-btn:hover {
+            background: #e2e8f0;
+        }
+        
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            background: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 2rem;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h2 {
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            font-size: 1.75rem;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #475569;
+            font-weight: 500;
+        }
+        
+        .required::after {
+            content: " *";
+            color: var(--danger);
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: #64748b;
+        }
+        
+        .btn-success {
+            background: var(--success);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .data-container {
+            background: #f8fafc;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            position: sticky;
+            top: 0;
+        }
+        
+        .data-table td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .data-table tr:hover {
+            background: #f1f5ff;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+        
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .config-card {
+            background: #f1f5f9;
+            border: 2px dashed #cbd5e1;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .config-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .instructions {
+            background: #f8fafc;
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .instructions ol {
+            margin-left: 1.5rem;
+            color: #475569;
+            line-height: 1.8;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 0.5rem;
+                border-radius: 0.75rem;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab-btn {
+                flex: 1;
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+            
+            .tab-content {
+                padding: 1rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-box {
+                min-width: 100%;
+            }
+            
+            .data-container {
+                max-height: 400px;
+            }
+            
+            .data-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h2>Testing Supabase Connection from GitHub Pages</h2>
-    <div id="status">Testing...</div>
-    <div id="result"></div>
-    
-    <script>
-        // Replace these with your actual values
-        const SUPABASE_URL = 'https://kmtrpnkftfqkthlgfwob.supabase.co'; // e.g., https://xyzabc.supabase.co
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttdHJwbmtmdGZxa3RobGdmd29iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MTgzMzUsImV4cCI6MjA3OTE5NDMzNX0.6aL-nG-srGEqI18Sp5kVCW2mG5f4Z53gF-csMZ7gfI0'; // From Supabase Settings → API
-        const TABLE_NAME = 'family_data_responses_gsheet';
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span>📊</span>
+                <span>Family Data Manager</span>
+            </div>
+            <div style="color: #cbd5e1; font-size: 0.9rem;">
+                Connected to Supabase
+            </div>
+        </header>
         
-        async function testConnection() {
-            const status = document.getElementById('status');
-            const result = document.getElementById('result');
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="form">📝 Fill Form</button>
+            <button class="tab-btn" data-tab="data">📊 View Data</button>
+            <button class="tab-btn" data-tab="config">⚙️ Settings</button>
+        </div>
+        
+        <!-- Form Tab -->
+        <div id="form-tab" class="tab-content active">
+            <h2>📝 Family Purchase Form</h2>
             
-            try {
-                status.innerHTML = '🔍 Testing connection...';
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="required">Form Serial Number</label>
+                    <input type="text" id="forms_sr_no" placeholder="Enter serial number">
+                </div>
                 
-                // Try to fetch one record
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_NAME}?limit=1`, {
-                    method: 'GET',
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Content-Type': 'application/json'
-                    }
+                <div class="form-group">
+                    <label class="required">Date</label>
+                    <input type="date" id="dated">
+                </div>
+                
+                <div class="form-group">
+                    <label class="required">Filled By</label>
+                    <input type="text" id="filled_by" placeholder="Your name">
+                </div>
+                
+                <div class="form-group">
+                    <label>Approximate Amount (₹)</label>
+                    <input type="number" id="approximately_amount" placeholder="0.00" step="0.01">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Home Items Related To</label>
+                <input type="text" id="todays_select_home_items_related_to" placeholder="Food, Body Care, etc.">
+            </div>
+            
+            <div class="form-group">
+                <label>Items to Buy</label>
+                <textarea id="todays_select_items_to_buy" placeholder="Enter items separated by commas"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Comments</label>
+                <textarea id="comments_about_today_purchase" placeholder="Any comments about today's purchase..."></textarea>
+            </div>
+            
+            <div class="controls">
+                <button class="btn" id="submit-btn">
+                    📤 Submit Form
+                </button>
+                <button class="btn btn-secondary" id="reset-btn">
+                    🔄 Reset
+                </button>
+            </div>
+            
+            <div id="form-alert"></div>
+        </div>
+        
+        <!-- Data Tab -->
+        <div id="data-tab" class="tab-content">
+            <h2>📊 Family Data Records</h2>
+            
+            <div class="controls">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Search records...">
+                </div>
+                <button class="btn" id="refresh-btn">
+                    🔄 Refresh
+                </button>
+                <button class="btn btn-success" id="export-btn">
+                    📥 Export CSV
+                </button>
+            </div>
+            
+            <div class="data-container">
+                <table class="data-table" id="data-table">
+                    <thead>
+                        <tr>
+                            <th>SR No</th>
+                            <th>Date</th>
+                            <th>Filled By</th>
+                            <th>Items</th>
+                            <th>Amount</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-body">
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 2rem;">
+                                Loading data...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="data-count" style="margin-top: 1rem; color: #64748b;"></div>
+        </div>
+        
+        <!-- Config Tab -->
+        <div id="config-tab" class="tab-content">
+            <h2>⚙️ Supabase Configuration</h2>
+            
+            <div class="config-card">
+                <div class="config-inputs">
+                    <div class="form-group">
+                        <label class="required">Supabase URL</label>
+                        <input type="url" id="config-url" placeholder="https://your-project.supabase.co">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="required">Anon Key</label>
+                        <input type="text" id="config-key" placeholder="your-anon-public-key">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Table Name</label>
+                        <input type="text" id="config-table" value="family_data_responses_gsheet">
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn" id="save-config-btn">
+                        💾 Save Configuration
+                    </button>
+                    <button class="btn btn-secondary" id="test-config-btn">
+                        🔗 Test Connection
+                    </button>
+                </div>
+                
+                <div id="config-alert"></div>
+            </div>
+            
+            <div class="instructions">
+                <h3 style="margin-bottom: 0.5rem;">How to get credentials:</h3>
+                <ol>
+                    <li>Go to your Supabase project dashboard</li>
+                    <li>Click <strong>Settings</strong> → <strong>API</strong></li>
+                    <li>Copy <strong>Project URL</strong> → URL field</li>
+                    <li>Copy <strong>anon public</strong> key → Key field</li>
+                    <li>Make sure RLS is disabled or you have proper policies</li>
+                    <li>Add your GitHub Pages URL to Supabase CORS settings</li>
+                </ol>
+            </div>
+            
+            <div id="test-result" style="margin-top: 1.5rem;"></div>
+        </div>
+    </div>
+
+    <script>
+        class FamilyDataManager {
+            constructor() {
+                this.config = {
+                    url: localStorage.getItem('supabase_url') || '',
+                    key: localStorage.getItem('supabase_key') || '',
+                    table: localStorage.getItem('supabase_table') || 'family_data_responses_gsheet'
+                };
+                
+                this.allData = [];
+                this.init();
+            }
+            
+            init() {
+                // Set today's date
+                document.getElementById('dated').value = new Date().toISOString().split('T')[0];
+                
+                // Load config into inputs
+                document.getElementById('config-url').value = this.config.url;
+                document.getElementById('config-key').value = this.config.key;
+                document.getElementById('config-table').value = this.config.table;
+                
+                // Setup event listeners
+                this.setupEventListeners();
+                
+                // Auto-load data if config exists
+                if (this.config.url && this.config.key) {
+                    this.loadData();
+                }
+            }
+            
+            setupEventListeners() {
+                // Tab switching
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const tab = e.target.dataset.tab;
+                        this.switchTab(tab);
+                    });
                 });
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    status.innerHTML = '✅ Connection successful!';
-                    result.innerHTML = `
-                        <h3>✅ CORS is working!</h3>
-                        <p>Fetched ${data.length} record(s)</p>
-                        <p>Headers received:</p>
-                        <pre>Access-Control-Allow-Origin: ${response.headers.get('Access-Control-Allow-Origin') || 'Not found'}</pre>
-                        ${data.length > 0 ? `<p>First record SR No: ${data[0].forms_sr_no || 'N/A'}</p>` : ''}
-                    `;
-                    console.log('Success! Data:', data);
-                } else {
-                    status.innerHTML = '❌ Server error';
-                    const error = await response.text();
-                    result.innerHTML = `
-                        <h3>❌ Error ${response.status}</h3>
-                        <pre>${error}</pre>
-                    `;
-                    console.error('Server error:', error);
+                // Form submission
+                document.getElementById('submit-btn').addEventListener('click', () => this.submitForm());
+                document.getElementById('reset-btn').addEventListener('click', () => this.resetForm());
+                
+                // Data actions
+                document.getElementById('refresh-btn').addEventListener('click', () => this.loadData());
+                document.getElementById('export-btn').addEventListener('click', () => this.exportCSV());
+                document.getElementById('search-input').addEventListener('input', (e) => this.filterData(e.target.value));
+                
+                // Config actions
+                document.getElementById('save-config-btn').addEventListener('click', () => this.saveConfig());
+                document.getElementById('test-config-btn').addEventListener('click', () => this.testConnection());
+            }
+            
+            switchTab(tabName) {
+                // Update buttons
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.tab === tabName);
+                });
+                
+                // Update content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.toggle('active', content.id === `${tabName}-tab`);
+                });
+                
+                // Load data when switching to data tab
+                if (tabName === 'data' && this.config.url && this.config.key) {
+                    this.loadData();
                 }
-            } catch (error) {
-                status.innerHTML = '❌ Network error';
-                result.innerHTML = `
-                    <h3>❌ Network Error</h3>
-                    <pre>${error.message}</pre>
-                    <p>Possible issues:</p>
-                    <ul>
-                        <li>CORS not configured correctly</li>
-                        <li>Wrong Supabase URL/Key</li>
-                        <li>Network blocked by browser</li>
-                    </ul>
+            }
+            
+            showAlert(message, type = 'info', elementId) {
+                const element = document.getElementById(elementId);
+                element.innerHTML = `
+                    <div class="alert alert-${type}">
+                        ${message}
+                    </div>
                 `;
-                console.error('Network error:', error);
+                
+                if (type !== 'info') {
+                    setTimeout(() => element.innerHTML = '', 5000);
+                }
+            }
+            
+            async submitForm() {
+                // Validate required fields
+                const required = ['forms_sr_no', 'dated', 'filled_by'];
+                const missing = required.filter(field => !document.getElementById(field).value.trim());
+                
+                if (missing.length > 0) {
+                    this.showAlert(`Please fill required fields: ${missing.join(', ')}`, 'error', 'form-alert');
+                    return;
+                }
+                
+                if (!this.config.url || !this.config.key) {
+                    this.showAlert('Please configure Supabase first', 'error', 'form-alert');
+                    this.switchTab('config');
+                    return;
+                }
+                
+                // Prepare data
+                const formData = {
+                    forms_sr_no: document.getElementById('forms_sr_no').value,
+                    timestamp: new Date().toISOString(),
+                    dated: document.getElementById('dated').value,
+                    todays_select_home_items_related_to: document.getElementById('todays_select_home_items_related_to').value,
+                    todays_select_items_to_buy: document.getElementById('todays_select_items_to_buy').value,
+                    comments_about_today_purchase: document.getElementById('comments_about_today_purchase').value,
+                    filled_by: document.getElementById('filled_by').value,
+                    approximately_amount: parseFloat(document.getElementById('approximately_amount').value) || 0,
+                    love_count: 0,
+                    love_counts: 0,
+                    score: 0,
+                    form_cat: 'Shop',
+                    update_to_custom_form_history: new Date().toISOString()
+                };
+                
+                this.showAlert('Submitting form...', 'info', 'form-alert');
+                
+                try {
+                    const response = await fetch(`${this.config.url}/rest/v1/${this.config.table}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': this.config.key,
+                            'Authorization': `Bearer ${this.config.key}`,
+                            'Prefer': 'return=representation'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    if (response.ok) {
+                        this.showAlert('✅ Form submitted successfully!', 'success', 'form-alert');
+                        this.resetForm();
+                        setTimeout(() => this.switchTab('data'), 1500);
+                    } else {
+                        const error = await response.json();
+                        this.showAlert(`❌ Error: ${error.message || 'Submission failed'}`, 'error', 'form-alert');
+                    }
+                } catch (error) {
+                    this.showAlert(`❌ Network error: ${error.message}`, 'error', 'form-alert');
+                }
+            }
+            
+            resetForm() {
+                document.getElementById('forms_sr_no').value = '';
+                document.getElementById('dated').value = new Date().toISOString().split('T')[0];
+                document.getElementById('filled_by').value = '';
+                document.getElementById('approximately_amount').value = '';
+                document.getElementById('todays_select_home_items_related_to').value = '';
+                document.getElementById('todays_select_items_to_buy').value = '';
+                document.getElementById('comments_about_today_purchase').value = '';
+            }
+            
+            async loadData() {
+                if (!this.config.url || !this.config.key) {
+                    this.showAlert('Configure Supabase first', 'error', 'data-count');
+                    this.switchTab('config');
+                    return;
+                }
+                
+                document.getElementById('data-body').innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 2rem;">
+                            Loading data...
+                        </td>
+                    </tr>
+                `;
+                
+                try {
+                    const response = await fetch(
+                        `${this.config.url}/rest/v1/${this.config.table}?order=timestamp.desc`,
+                        {
+                            headers: {
+                                'apikey': this.config.key,
+                                'Authorization': `Bearer ${this.config.key}`
+                            }
+                        }
+                    );
+                    
+                    if (response.ok) {
+                        this.allData = await response.json();
+                        this.renderData(this.allData);
+                        document.getElementById('data-count').textContent = 
+                            `📊 Showing ${this.allData.length} records`;
+                    } else {
+                        throw new Error('Failed to fetch data');
+                    }
+                } catch (error) {
+                    document.getElementById('data-body').innerHTML = `
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: #dc3545; padding: 2rem;">
+                                ❌ Error: ${error.message}
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
+            
+            renderData(data) {
+                const tbody = document.getElementById('data-body');
+                
+                if (data.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 2rem; color: #64748b;">
+                                📭 No data available
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                tbody.innerHTML = data.map(item => `
+                    <tr>
+                        <td><strong>${item.forms_sr_no || '-'}</strong></td>
+                        <td>${this.formatDate(item.dated)}</td>
+                        <td>${item.filled_by || '-'}</td>
+                        <td title="${item.todays_select_items_to_buy || ''}">
+                            ${this.truncate(item.todays_select_items_to_buy, 30)}
+                        </td>
+                        <td>${item.approximately_amount ? '₹' + item.approximately_amount : '-'}</td>
+                        <td>
+                            <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.875rem;"
+                                    onclick="manager.viewDetails(${JSON.stringify(item)})">
+                                👁️ View
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            
+            filterData(searchTerm) {
+                if (!searchTerm) {
+                    this.renderData(this.allData);
+                    return;
+                }
+                
+                const term = searchTerm.toLowerCase();
+                const filtered = this.allData.filter(item =>
+                    (item.forms_sr_no && item.forms_sr_no.toLowerCase().includes(term)) ||
+                    (item.filled_by && item.filled_by.toLowerCase().includes(term)) ||
+                    (item.todays_select_items_to_buy && item.todays_select_items_to_buy.toLowerCase().includes(term))
+                );
+                
+                this.renderData(filtered);
+                document.getElementById('data-count').textContent = 
+                    `📊 Showing ${filtered.length} of ${this.allData.length} records`;
+            }
+            
+            viewDetails(item) {
+                alert(`
+📋 Record Details:
+
+SR No: ${item.forms_sr_no}
+Date: ${this.formatDate(item.dated)}
+Filled By: ${item.filled_by}
+Amount: ${item.approximately_amount ? '₹' + item.approximately_amount : 'N/A'}
+
+Home Items: ${item.todays_select_home_items_related_to || 'N/A'}
+
+Items:
+${item.todays_select_items_to_buy || 'N/A'}
+
+Comments:
+${item.comments_about_today_purchase || 'N/A'}
+
+Submitted: ${new Date(item.timestamp).toLocaleString()}
+                `);
+            }
+            
+            exportCSV() {
+                if (this.allData.length === 0) {
+                    alert('No data to export');
+                    return;
+                }
+                
+                const headers = ['SR No', 'Date', 'Filled By', 'Items', 'Amount', 'Comments'];
+                const csv = [
+                    headers.join(','),
+                    ...this.allData.map(item => [
+                        item.forms_sr_no,
+                        item.dated,
+                        item.filled_by,
+                        `"${(item.todays_select_items_to_buy || '').replace(/"/g, '""')}"`,
+                        item.approximately_amount || '',
+                        `"${(item.comments_about_today_purchase || '').replace(/"/g, '""')}"`
+                    ].join(','))
+                ].join('\n');
+                
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `family_data_${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+            
+            saveConfig() {
+                this.config.url = document.getElementById('config-url').value.trim();
+                this.config.key = document.getElementById('config-key').value.trim();
+                this.config.table = document.getElementById('config-table').value.trim();
+                
+                if (!this.config.url || !this.config.key) {
+                    this.showAlert('Please enter both URL and Key', 'error', 'config-alert');
+                    return;
+                }
+                
+                localStorage.setItem('supabase_url', this.config.url);
+                localStorage.setItem('supabase_key', this.config.key);
+                localStorage.setItem('supabase_table', this.config.table);
+                
+                this.showAlert('✅ Configuration saved!', 'success', 'config-alert');
+            }
+            
+            async testConnection() {
+                if (!this.config.url || !this.config.key) {
+                    this.showAlert('Please save configuration first', 'error', 'test-result');
+                    return;
+                }
+                
+                this.showAlert('Testing connection...', 'info', 'test-result');
+                
+                try {
+                    const response = await fetch(`${this.config.url}/rest/v1/${this.config.table}?limit=1`, {
+                        headers: {
+                            'apikey': this.config.key,
+                            'Authorization': `Bearer ${this.config.key}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        this.showAlert('✅ Connection successful!', 'success', 'test-result');
+                    } else {
+                        const error = await response.json();
+                        this.showAlert(`❌ Error: ${error.message || response.statusText}`, 'error', 'test-result');
+                    }
+                } catch (error) {
+                    this.showAlert(`❌ Network error: ${error.message}`, 'error', 'test-result');
+                }
+            }
+            
+            formatDate(dateStr) {
+                if (!dateStr) return '-';
+                return new Date(dateStr).toLocaleDateString('en-IN');
+            }
+            
+            truncate(text, length) {
+                if (!text) return '-';
+                return text.length > length ? text.substring(0, length) + '...' : text;
             }
         }
         
-        // Run test when page loads
-        window.onload = testConnection;
+        // Initialize the app
+        const manager = new FamilyDataManager();
+        window.manager = manager; // Make it available globally for button clicks
     </script>
 </body>
 </html>
