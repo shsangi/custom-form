@@ -3,63 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family Expenses Tracker</title>
+    <title>Family Purchase Manager</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f8fafc;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --text: #334155;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --card-bg: #ffffff;
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            --radius: 16px;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-
-        :root {
-            --primary: #4361ee;
-            --primary-light: #4895ef;
-            --secondary: #3f37c9;
-            --success: #4cc9f0;
-            --danger: #f72585;
-            --warning: #f8961e;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --gray: #6c757d;
-            --gray-light: #e9ecef;
-            --border-radius: 12px;
-            --shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            --shadow-light: 0 5px 20px rgba(0, 0, 0, 0.05);
-            --transition: all 0.3s ease;
         }
 
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
-            color: var(--dark);
-        }
-
-        .container {
-            width: 100%;
-            max-width: 480px;
-            margin: 0 auto;
+            color: var(--text);
         }
 
         /* Login Screen */
         .login-screen {
-            background: white;
-            border-radius: var(--border-radius);
+            background: var(--card-bg);
+            border-radius: var(--radius);
             box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 480px;
             padding: 40px 30px;
             text-align: center;
-            animation: fadeIn 0.5s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .login-icon {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -67,965 +61,841 @@
             margin: 0 auto 25px;
             color: white;
             font-size: 32px;
-            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.3);
         }
 
         .login-title {
             font-size: 28px;
             font-weight: 700;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .login-subtitle {
-            color: var(--gray);
+            color: var(--text-light);
             margin-bottom: 30px;
             font-size: 16px;
         }
 
-        .input-group {
+        .pin-input-container {
             position: relative;
             margin-bottom: 25px;
         }
 
-        .input-icon {
-            position: absolute;
-            left: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray);
-            z-index: 2;
-        }
-
-        .form-input {
+        .pin-input {
             width: 100%;
-            padding: 16px 20px 16px 50px;
-            border: 2px solid var(--gray-light);
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            transition: var(--transition);
-            background: white;
+            padding: 18px 20px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 8px;
+            text-align: center;
+            transition: all 0.3s;
+            background: var(--secondary);
         }
 
-        .form-input:focus {
+        .pin-input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
 
-        .btn {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            box-shadow: 0 5px 20px rgba(67, 97, 238, 0.25);
+        .pin-input::placeholder {
+            letter-spacing: normal;
+            color: var(--text-light);
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.35);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn-secondary {
-            background: var(--gray);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #4cc9f0, #4895ef);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #f72585, #b5179e);
-        }
-
-        /* App Container */
+        /* Main App */
         .app-container {
-            background: white;
-            border-radius: var(--border-radius);
+            display: none;
+            width: 100%;
+            max-width: 1200px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
             box-shadow: var(--shadow);
             overflow: hidden;
-            display: none;
             height: 90vh;
-            max-height: 800px;
-            animation: slideUp 0.5s ease;
         }
 
         /* Header */
         .app-header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            padding: 20px;
+            padding: 20px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: relative;
         }
 
-        .app-title {
-            font-size: 20px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .user-info {
+        .app-header h1 {
+            font-size: 24px;
+            font-weight: 700;
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
+        .header-actions {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 18px;
+            gap: 15px;
         }
 
-        .logout-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+        .user-badge {
             display: flex;
             align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
         }
 
         /* Tabs */
-        .tabs {
+        .app-tabs {
             display: flex;
-            background: var(--gray-light);
-            padding: 5px;
-            margin: 0 20px;
-            border-radius: 50px;
-            position: relative;
-            top: -10px;
+            background: var(--secondary);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
-        .tab {
-            flex: 1;
-            padding: 12px;
+        .tab-btn {
+            flex: none;
+            padding: 20px 30px;
             border: none;
-            background: transparent;
-            color: var(--gray);
+            background: none;
+            font-size: 16px;
             font-weight: 600;
-            font-size: 14px;
+            color: var(--text-light);
             cursor: pointer;
-            border-radius: 50px;
-            transition: var(--transition);
+            transition: all 0.3s;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
+            gap: 10px;
+            white-space: nowrap;
+            position: relative;
         }
 
-        .tab.active {
-            background: white;
+        .tab-btn:hover {
             color: var(--primary);
-            box-shadow: var(--shadow-light);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            background: var(--card-bg);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
         }
 
         /* Tab Content */
         .tab-content {
-            padding: 20px;
-            height: calc(100% - 120px);
+            padding: 30px;
             overflow-y: auto;
+            height: calc(100% - 80px);
+        }
+
+        .tab-pane {
             display: none;
         }
 
-        .tab-content.active {
+        .tab-pane.active {
             display: block;
-            animation: fadeIn 0.3s ease;
         }
 
-        /* Form Tab */
-        .form-container {
-            padding-bottom: 20px;
-        }
-
+        /* Form Styles */
         .form-section {
-            background: var(--light);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid var(--gray-light);
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
         }
 
         .section-title {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 25px;
             color: var(--primary);
+            font-size: 20px;
             font-weight: 600;
-            font-size: 16px;
         }
 
-        .section-icon {
-            width: 36px;
-            height: 36px;
-            background: var(--primary);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .form-row {
+        .form-grid {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        @media (min-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr 1fr;
-            }
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--dark);
-            font-size: 14px;
-        }
-
-        .form-label span {
-            color: var(--danger);
-        }
-
-        .form-textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid var(--gray-light);
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            transition: var(--transition);
-            min-height: 100px;
-            resize: vertical;
-            font-family: inherit;
-        }
-
-        .form-textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-        }
-
-        .form-select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid var(--gray-light);
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            transition: var(--transition);
-            background: white;
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 16px;
-        }
-
-        .form-select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-        }
-
-        .amount-input {
-            position: relative;
-        }
-
-        .amount-prefix {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
             font-weight: 600;
-            color: var(--primary);
-        }
-
-        .amount-input .form-input {
-            padding-left: 40px;
-        }
-
-        .file-upload {
-            border: 2px dashed var(--gray-light);
-            border-radius: var(--border-radius);
-            padding: 30px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-            background: white;
-        }
-
-        .file-upload:hover {
-            border-color: var(--primary);
-            background: rgba(67, 97, 238, 0.02);
-        }
-
-        .file-upload-icon {
-            font-size: 40px;
-            color: var(--gray);
-            margin-bottom: 10px;
-        }
-
-        .file-upload-text {
-            color: var(--gray);
+            color: var(--text);
             font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .file-upload input[type="file"] {
-            display: none;
+        .required::after {
+            content: '*';
+            color: var(--danger);
+            margin-left: 4px;
         }
 
-        /* View Data Tab */
+        .form-control {
+            padding: 15px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: var(--secondary);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--accent), #059669);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+
+        .btn-icon {
+            padding: 12px;
+            width: 44px;
+            height: 44px;
+        }
+
+        /* Data View Styles */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
         .stat-card {
-            background: white;
-            border-radius: var(--border-radius);
-            padding: 20px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 25px;
             text-align: center;
-            box-shadow: var(--shadow-light);
-            border: 1px solid var(--gray-light);
+            border: 1px solid var(--border);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
         }
 
         .stat-icon {
             width: 50px;
             height: 50px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
             margin: 0 auto 15px;
+            color: white;
             font-size: 20px;
         }
 
         .stat-number {
-            font-size: 24px;
+            font-size: 32px;
             font-weight: 700;
             margin-bottom: 5px;
-            color: var(--dark);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .stat-label {
-            color: var(--gray);
-            font-size: 12px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .data-controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .data-controls .btn {
-            flex: 1;
-            min-width: 120px;
-            padding: 12px;
+            color: var(--text-light);
             font-size: 14px;
+            font-weight: 500;
         }
 
         .data-table-container {
-            background: white;
-            border-radius: var(--border-radius);
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
             overflow: hidden;
-            border: 1px solid var(--gray-light);
-            box-shadow: var(--shadow-light);
+            margin-top: 20px;
         }
 
-        .table-header {
-            display: grid;
-            grid-template-columns: 60px 100px 1fr 80px;
-            background: var(--light);
-            padding: 15px;
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .data-table thead {
+            background: var(--secondary);
+        }
+
+        .data-table th {
+            padding: 18px 15px;
+            text-align: left;
             font-weight: 600;
-            font-size: 13px;
-            color: var(--gray);
-            border-bottom: 1px solid var(--gray-light);
-        }
-
-        .table-row {
-            display: grid;
-            grid-template-columns: 60px 100px 1fr 80px;
-            padding: 15px;
-            border-bottom: 1px solid var(--gray-light);
-            transition: var(--transition);
-        }
-
-        .table-row:hover {
-            background: rgba(67, 97, 238, 0.02);
-        }
-
-        .table-row:last-child {
-            border-bottom: none;
-        }
-
-        .table-cell {
-            display: flex;
-            align-items: center;
+            color: var(--text);
             font-size: 14px;
-        }
-
-        .table-cell.amount {
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            color: var(--gray);
-        }
-
-        .empty-icon {
-            font-size: 60px;
-            margin-bottom: 20px;
-            color: var(--gray-light);
-        }
-
-        /* Info Tab */
-        .info-container {
-            text-align: center;
-            padding: 20px 0;
-        }
-
-        .info-icon {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 40px;
-            margin: 0 auto 25px;
-            box-shadow: 0 10px 30px rgba(67, 97, 238, 0.3);
-        }
-
-        .info-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: var(--dark);
-        }
-
-        .info-description {
-            color: var(--gray);
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-
-        .info-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .info-stat {
-            background: var(--light);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            text-align: center;
-        }
-
-        .info-stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-
-        .info-stat-label {
-            color: var(--gray);
-            font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border);
         }
 
-        /* Alerts */
-        .alert {
-            padding: 15px;
-            border-radius: var(--border-radius);
-            margin-bottom: 20px;
-            display: none;
-            animation: slideIn 0.3s ease;
+        .data-table td {
+            padding: 18px 15px;
+            border-bottom: 1px solid var(--border);
         }
 
-        .alert-success {
-            background: rgba(76, 201, 240, 0.1);
-            border: 1px solid rgba(76, 201, 240, 0.3);
-            color: #0c8599;
+        .data-table tbody tr:hover {
+            background: var(--secondary);
         }
 
-        .alert-error {
-            background: rgba(247, 37, 133, 0.1);
-            border: 1px solid rgba(247, 37, 133, 0.3);
-            color: #e03131;
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
         }
 
-        .alert-info {
-            background: rgba(67, 97, 238, 0.1);
-            border: 1px solid rgba(67, 97, 238, 0.3);
-            color: var(--primary);
+        .badge-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent);
         }
 
-        /* Loading */
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+
+        /* Loading States */
         .loading {
-            text-align: center;
-            padding: 40px;
-            display: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            color: var(--text-light);
         }
 
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid var(--gray-light);
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(-10px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            margin-bottom: 20px;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        /* Responsive */
-        @media (max-width: 480px) {
-            .container {
-                max-width: 100%;
-            }
-            
-            .login-screen {
-                padding: 30px 20px;
-            }
-            
+        /* Alerts */
+        .alert {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .alert-info {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
             .app-container {
                 height: 95vh;
+            }
+            
+            .app-header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .tab-btn {
+                padding: 15px 20px;
+                font-size: 14px;
+            }
+            
+            .tab-content {
+                padding: 20px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stat-card {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-screen {
+                padding: 30px 20px;
             }
             
             .stats-grid {
                 grid-template-columns: 1fr;
             }
             
-            .table-header, .table-row {
-                grid-template-columns: 50px 80px 1fr 70px;
-                padding: 12px;
-                font-size: 12px;
+            .header-actions {
+                flex-direction: column;
+                width: 100%;
             }
             
-            .info-stats {
-                grid-template-columns: 1fr;
+            .user-badge {
+                width: 100%;
+                justify-content: center;
             }
         }
 
-        /* Hide scrollbar but keep functionality */
-        .tab-content::-webkit-scrollbar {
-            width: 6px;
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
 
-        .tab-content::-webkit-scrollbar-track {
-            background: var(--gray-light);
-            border-radius: 10px;
+        ::-webkit-scrollbar-track {
+            background: var(--secondary);
+            border-radius: 4px;
         }
 
-        .tab-content::-webkit-scrollbar-thumb {
+        ::-webkit-scrollbar-thumb {
             background: var(--primary);
-            border-radius: 10px;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Login Screen -->
-        <div class="login-screen" id="login-screen">
-            <div class="login-icon">
-                <i class="fas fa-lock"></i>
-            </div>
-            <h1 class="login-title">Family Expenses</h1>
-            <p class="login-subtitle">Secure access to your family spending tracker</p>
-            
-            <div class="input-group">
-                <i class="fas fa-key input-icon"></i>
-                <input type="password" class="form-input" id="pin-input" placeholder="Enter your secure PIN" autocomplete="off">
-            </div>
-            
-            <button class="btn" onclick="login()">
-                <i class="fas fa-sign-in-alt"></i>
-                Access Dashboard
-            </button>
-            
-            <div id="login-alert" class="alert"></div>
-            
-            <div style="margin-top: 30px; color: var(--gray); font-size: 14px;">
-                <i class="fas fa-shield-alt"></i>
-                All data is securely encrypted
+    <!-- Login Screen -->
+    <div class="login-screen" id="login-screen">
+        <div class="login-icon">
+            <i class="fas fa-lock"></i>
+        </div>
+        <h1 class="login-title">Welcome Back</h1>
+        <p class="login-subtitle">Enter your secure PIN to continue</p>
+        
+        <div class="pin-input-container">
+            <input type="password" class="pin-input" id="pin-input" placeholder="Enter PIN" maxlength="6" autocomplete="off">
+        </div>
+        
+        <button class="btn btn-primary" onclick="login()">
+            <i class="fas fa-sign-in-alt"></i> Access Dashboard
+        </button>
+        
+        <div id="login-alert" class="alert" style="display: none;"></div>
+        
+        <div style="margin-top: 30px; font-size: 14px; color: var(--text-light);">
+            <i class="fas fa-shield-alt"></i> Secure connection • Encrypted data
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div class="app-container" id="app-container">
+        <!-- Header -->
+        <div class="app-header">
+            <h1>
+                <i class="fas fa-home"></i> Family Purchase Manager
+            </h1>
+            <div class="header-actions">
+                <div class="user-badge">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="user-name">Loading...</span>
+                </div>
+                <button class="btn btn-secondary btn-icon" onclick="logout()" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
             </div>
         </div>
 
-        <!-- Main App -->
-        <div class="app-container" id="app-container">
-            <!-- Header -->
-            <div class="app-header">
-                <div class="app-title">
-                    <i class="fas fa-home"></i>
-                    Family Expenses
-                </div>
-                <div class="user-info">
-                    <div class="user-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <button class="logout-btn" onclick="logout()" title="Logout">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </button>
-                </div>
-            </div>
+        <!-- Tabs -->
+        <div class="app-tabs">
+            <button class="tab-btn active" onclick="switchTab('form')">
+                <i class="fas fa-edit"></i> New Entry
+            </button>
+            <button class="tab-btn" onclick="switchTab('view')">
+                <i class="fas fa-table"></i> View Data
+            </button>
+            <button class="tab-btn" onclick="switchTab('analytics')">
+                <i class="fas fa-chart-bar"></i> Analytics
+            </button>
+        </div>
 
-            <!-- Tabs -->
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab('fill-form')">
-                    <i class="fas fa-plus-circle"></i>
-                    <span class="tab-text">New Entry</span>
-                </button>
-                <button class="tab" onclick="switchTab('view-data')">
-                    <i class="fas fa-history"></i>
-                    <span class="tab-text">History</span>
-                </button>
-                <button class="tab" onclick="switchTab('info')">
-                    <i class="fas fa-info-circle"></i>
-                    <span class="tab-text">Info</span>
-                </button>
-            </div>
-
-            <!-- Tab Contents -->
-            <div class="tab-content active" id="fill-form">
-                <div class="form-container">
-                    <!-- Alert for form -->
-                    <div id="form-alert" class="alert"></div>
-                    
-                    <!-- Form Section 1: Basic Info -->
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Form Tab -->
+            <div id="form-tab" class="tab-pane active">
+                <form id="purchase-form">
+                    <!-- Basic Information -->
                     <div class="form-section">
                         <div class="section-title">
-                            <div class="section-icon">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            Who's filling this?
+                            <i class="fas fa-info-circle"></i> Basic Information
                         </div>
-                        <div class="form-row">
+                        <div class="form-grid">
                             <div class="form-group">
-                                <label class="form-label">Your Name <span>*</span></label>
-                                <input type="text" class="form-input" id="filled_by" placeholder="Enter your name">
+                                <label class="form-label required">Serial Number</label>
+                                <input type="number" class="form-control" id="forms_sr_no" required>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Special Event</label>
-                                <select class="form-select" id="special_event">
-                                    <option value="">Regular day</option>
-                                    <option value="birthday">Birthday</option>
-                                    <option value="anniversary">Anniversary</option>
-                                    <option value="festival">Festival</option>
-                                    <option value="guest_visit">Guest Visit</option>
+                                <label class="form-label required">Date</label>
+                                <input type="date" class="form-control" id="dated" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">Filled By</label>
+                                <input type="text" class="form-control" id="filled_by" placeholder="Your name" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Purchase Details -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-shopping-cart"></i> Purchase Details
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label required">Home Items Category</label>
+                                <select class="form-control" id="home_items_related" required>
+                                    <option value="">Select category</option>
+                                    <option value="kitchen">Kitchen</option>
+                                    <option value="bathroom">Bathroom</option>
+                                    <option value="bedroom">Bedroom</option>
+                                    <option value="living_room">Living Room</option>
+                                    <option value="grocery">Grocery</option>
                                     <option value="other">Other</option>
                                 </select>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Form Section 2: Items -->
-                    <div class="form-section">
-                        <div class="section-title">
-                            <div class="section-icon">
-                                <i class="fas fa-shopping-cart"></i>
-                            </div>
-                            What to buy?
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Category <span>*</span></label>
-                            <select class="form-select" id="category">
-                                <option value="">Select category</option>
-                                <option value="groceries">Groceries</option>
-                                <option value="vegetables">Vegetables & Fruits</option>
-                                <option value="dairy">Dairy Products</option>
-                                <option value="meat">Meat & Fish</option>
-                                <option value="household">Household Items</option>
-                                <option value="personal">Personal Care</option>
-                                <option value="medicine">Medicine</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Items List <span>*</span></label>
-                            <textarea class="form-textarea" id="items_list" placeholder="List all items to purchase (one per line)"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Detailed Items</label>
-                            <textarea class="form-textarea" id="detailed_items" placeholder="Detailed description of items"></textarea>
-                        </div>
-                    </div>
-
-                    <!-- Form Section 3: Amount & File -->
-                    <div class="form-section">
-                        <div class="section-title">
-                            <div class="section-icon">
-                                <i class="fas fa-file-invoice-dollar"></i>
-                            </div>
-                            Amount & Attachment
-                        </div>
-                        <div class="form-row">
                             <div class="form-group">
-                                <label class="form-label">Approximate Amount <span>*</span></label>
-                                <div class="amount-input">
-                                    <span class="amount-prefix">₹</span>
-                                    <input type="number" class="form-input" id="amount" placeholder="0.00" step="0.01">
-                                </div>
+                                <label class="form-label required">Approximate Amount (₹)</label>
+                                <input type="number" class="form-control" id="approximately_amount" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label class="form-label required">Items to Buy</label>
+                            <textarea class="form-control" id="todays_select_items_to_buy" placeholder="List each item on a new line..." required></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Additional Information -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-sticky-note"></i> Additional Information
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Special Event</label>
+                                <input type="text" class="form-control" id="special_event" placeholder="Birthday, Festival, etc.">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Food Activity</label>
-                                <select class="form-select" id="food_activity">
-                                    <option value="">Not related</option>
-                                    <option value="cooking">Cooking at home</option>
-                                    <option value="eating_out">Eating out</option>
-                                    <option value="party">Party/Function</option>
-                                    <option value="snacks">Snacks</option>
-                                </select>
+                                <input type="text" class="form-control" id="food_activity_details" placeholder="Dinner party, Picnic, etc.">
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Upload List (Optional)</label>
-                            <div class="file-upload" onclick="document.getElementById('file_upload').click()">
-                                <div class="file-upload-icon">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                </div>
-                                <div class="file-upload-text">
-                                    Click to upload image or file<br>
-                                    <small>Supports JPG, PNG, PDF, TXT</small>
-                                </div>
-                                <input type="file" id="file_upload" accept=".jpg,.jpeg,.png,.pdf,.txt" style="display: none;">
-                            </div>
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label class="form-label required">All Items List</label>
+                            <textarea class="form-control" id="all_items_list" placeholder="Paste all items from your list here..." required></textarea>
                         </div>
-                    </div>
-
-                    <!-- Form Section 4: Comments -->
-                    <div class="form-section">
-                        <div class="section-title">
-                            <div class="section-icon">
-                                <i class="fas fa-comment-alt"></i>
-                            </div>
-                            Additional Notes
-                        </div>
-                        <div class="form-group">
+                        <div class="form-group" style="margin-top: 20px;">
                             <label class="form-label">Comments</label>
-                            <textarea class="form-textarea" id="comments" placeholder="Any additional notes about today's purchase..."></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Love Count ❤️</label>
-                            <div style="display: flex; gap: 10px;">
-                                <button class="btn-secondary" style="flex: 1;" onclick="updateLoveCount(-1)">-</button>
-                                <input type="number" class="form-input" id="love_count" value="0" min="0" style="text-align: center; padding: 12px;">
-                                <button class="btn-success" style="flex: 1;" onclick="updateLoveCount(1)">+</button>
-                            </div>
+                            <textarea class="form-control" id="comments_about_today_purchase" placeholder="Any additional comments about today's purchase..."></textarea>
                         </div>
                     </div>
 
-                    <!-- Submit Button -->
-                    <button class="btn" onclick="submitForm()">
-                        <i class="fas fa-paper-plane"></i>
-                        Submit Entry
-                    </button>
-                </div>
+                    <!-- Form Actions -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Save Entry
+                        </button>
+                        <button type="reset" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> Clear Form
+                        </button>
+                    </div>
+                </form>
+                <div id="form-alert" class="alert" style="display: none;"></div>
             </div>
 
             <!-- View Data Tab -->
-            <div class="tab-content" id="view-data">
-                <!-- Loading -->
+            <div id="view-tab" class="tab-pane">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <div class="section-title">
+                        <i class="fas fa-database"></i> All Purchase Records
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-secondary" onclick="refreshData()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button class="btn btn-success" onclick="exportData()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Overview -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <div class="stat-number" id="total-records">0</div>
+                        <div class="stat-label">Total Records</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-indian-rupee-sign"></i>
+                        </div>
+                        <div class="stat-number" id="total-amount">₹0</div>
+                        <div class="stat-label">Total Amount</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="stat-number" id="today-records">0</div>
+                        <div class="stat-label">Today's Records</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-number" id="unique-users">0</div>
+                        <div class="stat-label">Unique Users</div>
+                    </div>
+                </div>
+
+                <!-- Data Table -->
                 <div id="data-loading" class="loading">
-                    <div class="loading-spinner"></div>
-                    <p>Loading your data...</p>
+                    <div class="spinner"></div>
+                    <p>Loading your purchase data...</p>
                 </div>
 
-                <!-- Data Content -->
-                <div id="data-content">
-                    <!-- Stats -->
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-receipt"></i>
-                            </div>
-                            <div class="stat-number" id="total-records">0</div>
-                            <div class="stat-label">Total Entries</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-indian-rupee-sign"></i>
-                            </div>
-                            <div class="stat-number" id="total-amount">₹0</div>
-                            <div class="stat-label">Total Spent</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-calendar-day"></i>
-                            </div>
-                            <div class="stat-number" id="today-records">0</div>
-                            <div class="stat-label">Today's Entries</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="stat-number" id="unique-users">0</div>
-                            <div class="stat-label">Family Members</div>
-                        </div>
-                    </div>
-
-                    <!-- Controls -->
-                    <div class="data-controls">
-                        <button class="btn" onclick="refreshData()">
-                            <i class="fas fa-sync-alt"></i>
-                            Refresh
-                        </button>
-                        <button class="btn-success" onclick="exportData()">
-                            <i class="fas fa-download"></i>
-                            Export
-                        </button>
-                        <button class="btn-secondary" onclick="showAllData()">
-                            <i class="fas fa-list"></i>
-                            Show All
-                        </button>
-                    </div>
-
-                    <!-- Alert -->
-                    <div id="data-alert" class="alert"></div>
-
-                    <!-- Data Table -->
+                <div id="data-container" style="display: none;">
                     <div class="data-table-container">
-                        <div class="table-header">
-                            <div>#</div>
-                            <div>Date</div>
-                            <div>Items</div>
-                            <div>Amount</div>
-                        </div>
-                        <div id="data-body">
-                            <!-- Data will be loaded here -->
-                            <div class="empty-state">
-                                <div class="empty-icon">
-                                    <i class="fas fa-receipt"></i>
-                                </div>
-                                <p>No entries yet</p>
-                                <p style="font-size: 14px; margin-top: 10px;">Add your first expense in the New Entry tab</p>
-                            </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>SR No</th>
+                                        <th>Date</th>
+                                        <th>Filled By</th>
+                                        <th>Category</th>
+                                        <th>Amount</th>
+                                        <th>Items</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="data-body">
+                                    <!-- Data will be loaded here -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
+                    
+                    <!-- Pagination -->
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 25px; padding: 15px;">
+                        <button class="btn btn-secondary" onclick="changePage(-1)" id="prev-page" disabled>
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </button>
+                        <span style="color: var(--text-light); font-weight: 500;" id="page-info">Page 1 of 1</span>
+                        <button class="btn btn-secondary" onclick="changePage(1)" id="next-page" disabled>
+                            Next <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
+
+                <div id="data-alert" class="alert" style="display: none;"></div>
             </div>
 
-            <!-- Info Tab -->
-            <div class="tab-content" id="info">
-                <div class="info-container">
-                    <div class="info-icon">
-                        <i class="fas fa-home"></i>
+            <!-- Analytics Tab -->
+            <div id="analytics-tab" class="tab-pane">
+                <div class="section-title">
+                    <i class="fas fa-chart-pie"></i> Purchase Analytics
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                        <div class="stat-number" id="total-items">0</div>
+                        <div class="stat-label">Total Items</div>
                     </div>
-                    <h2 class="info-title">Family Expenses Tracker</h2>
-                    <p class="info-description">
-                        A secure and private way to track your family's daily expenses.
-                        All data is encrypted and accessible only with your PIN.
-                    </p>
-                    
-                    <div class="info-stats">
-                        <div class="info-stat">
-                            <div class="info-stat-value" id="info-total-entries">0</div>
-                            <div class="info-stat-label">Total Entries</div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-utensils"></i>
                         </div>
-                        <div class="info-stat">
-                            <div class="info-stat-value" id="info-total-amount">₹0</div>
-                            <div class="info-stat-label">Total Amount</div>
+                        <div class="stat-number" id="food-activities">0</div>
+                        <div class="stat-label">Food Activities</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-gift"></i>
                         </div>
-                        <div class="info-stat">
-                            <div class="info-stat-value" id="info-avg-amount">₹0</div>
-                            <div class="info-stat-label">Average/Entry</div>
+                        <div class="stat-number" id="special-events">0</div>
+                        <div class="stat-label">Special Events</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-comments"></i>
                         </div>
-                        <div class="info-stat">
-                            <div class="info-stat-value" id="info-total-days">0</div>
-                            <div class="info-stat-label">Days Tracked</div>
+                        <div class="stat-number" id="total-comments">0</div>
+                        <div class="stat-label">Comments</div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="form-section" style="margin-top: 30px;">
+                    <div class="section-title">
+                        <i class="fas fa-history"></i> Recent Activity
+                    </div>
+                    <div id="recent-activity">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Loading activity...</p>
                         </div>
                     </div>
-                    
-                    <div style="margin-top: 40px; padding: 20px; background: var(--light); border-radius: var(--border-radius);">
-                        <h3 style="margin-bottom: 15px; color: var(--primary);">
-                            <i class="fas fa-shield-alt"></i>
-                            Security Features
-                        </h3>
-                        <div style="text-align: left; color: var(--gray); line-height: 1.8; font-size: 14px;">
-                            <p>✓ All data is encrypted end-to-end</p>
-                            <p>✓ Your PIN never leaves your device</p>
-                            <p>✓ No personal data is stored on servers</p>
-                            <p>✓ Automatic session timeout</p>
+                </div>
+
+                <!-- Top Categories -->
+                <div class="form-section" style="margin-top: 30px;">
+                    <div class="section-title">
+                        <i class="fas fa-chart-bar"></i> Top Categories
+                    </div>
+                    <div id="category-chart">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Loading categories...</p>
                         </div>
                     </div>
                 </div>
@@ -1035,563 +905,509 @@
 
     <script>
         // ============================================
-        // CONFIGURATION (Hidden from user)
+        // CONFIGURATION (Hidden from users)
         // ============================================
-        const ADMIN_PROJECT = {
+        const ADMIN_CONFIG = {
             url: 'https://kmtrpnkftfqkthlgfwob.supabase.co',
-            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttdHJwbmtmdGZxa3RobGdmd29iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MTgzMzUsImV4cCI6MjA3OTE5NDMzNX0.6aL-nG-srGEqI18Sp5kVCW2mG5f4Z53gF-csMZ7gfI0'
+            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttdHJwbmtmdGZxa3RobGdmd29iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM2MTgzMzUsImV4cCI6MjA3OTE5NDMzNX0.6aL-nG-srGEqI18Sp5kVCW2mG5f4Z53gF-csMZ7gfI0',
+            table: 'family_data_responses_gsheet'
         };
 
         // ============================================
         // STATE MANAGEMENT
         // ============================================
-        let currentConfig = null;
-        let currentPin = '';
+        let currentUser = null;
         let allData = [];
-        let userName = '';
+        let currentPage = 1;
+        const recordsPerPage = 10;
 
         // ============================================
-        // ENCRYPTION/DECRYPTION (Hidden algorithm)
+        // ENCRYPTION FUNCTIONS (Hidden from users)
         // ============================================
+        const encryptionMap = {
+            'a': 'o', 'b': 'k', 'c': 'x', 'd': 'z', 'e': 'p',
+            'f': 'q', 'g': 'r', 'h': 's', 'i': 't', 'j': 'u',
+            'k': 'v', 'l': 'w', 'm': 'a', 'n': 'b', 'o': 'c',
+            'p': 'd', 'q': 'e', 'r': 'f', 's': 'g', 't': 'h',
+            'u': 'i', 'v': 'j', 'w': 'l', 'x': 'm', 'y': 'n',
+            'z': 'y', '0': '7', '1': '8', '2': '9', '3': '4',
+            '4': '5', '5': '6', '6': '0', '7': '1', '8': '2',
+            '9': '3'
+        };
+
+        const decryptionMap = Object.fromEntries(
+            Object.entries(encryptionMap).map(([k, v]) => [v, k])
+        );
+
         function encrypt(text) {
             if (!text) return '';
-            const mapping = {
-                'a': 'o', 'b': 'k', 'c': 'x', 'd': 'z', 'e': 'p',
-                'f': 'q', 'g': 'r', 'h': 's', 'i': 't', 'j': 'u',
-                'k': 'v', 'l': 'w', 'm': 'a', 'n': 'b', 'o': 'c',
-                'p': 'd', 'q': 'e', 'r': 'f', 's': 'g', 't': 'h',
-                'u': 'i', 'v': 'j', 'w': 'l', 'x': 'm', 'y': 'n',
-                'z': 'y',
-                'A': 'O', 'B': 'K', 'C': 'X', 'D': 'Z', 'E': 'P',
-                'F': 'Q', 'G': 'R', 'H': 'S', 'I': 'T', 'J': 'U',
-                'K': 'V', 'L': 'W', 'M': 'A', 'N': 'B', 'O': 'C',
-                'P': 'D', 'Q': 'E', 'R': 'F', 'S': 'G', 'T': 'H',
-                'U': 'I', 'V': 'J', 'W': 'L', 'X': 'M', 'Y': 'N',
-                'Z': 'Y',
-                '0': '7', '1': '8', '2': '9', '3': '4', '4': '5',
-                '5': '6', '6': '0', '7': '1', '8': '2', '9': '3'
-            };
-            return text.split('').map(ch => mapping[ch] || ch).join('');
+            return text.split('').map(char => encryptionMap[char] || char).join('');
         }
 
         function decrypt(text) {
             if (!text) return '';
-            const reverseMapping = {};
-            const mapping = {
-                'a': 'o', 'b': 'k', 'c': 'x', 'd': 'z', 'e': 'p',
-                'f': 'q', 'g': 'r', 'h': 's', 'i': 't', 'j': 'u',
-                'k': 'v', 'l': 'w', 'm': 'a', 'n': 'b', 'o': 'c',
-                'p': 'd', 'q': 'e', 'r': 'f', 's': 'g', 't': 'h',
-                'u': 'i', 'v': 'j', 'w': 'l', 'x': 'm', 'y': 'n',
-                'z': 'y'
-            };
-            for (const [key, value] of Object.entries(mapping)) {
-                reverseMapping[value] = key;
-            }
-            return text.split('').map(ch => reverseMapping[ch] || ch).join('');
+            return text.split('').map(char => decryptionMap[char] || char).join('');
         }
 
         // ============================================
-        // TAB MANAGEMENT
+        // UI FUNCTIONS
         // ============================================
         function switchTab(tabName) {
             // Update active tab button
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
             });
             event.target.classList.add('active');
-            
-            // Update active tab content
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
+
+            // Show selected tab content
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('active');
             });
-            document.getElementById(tabName).classList.add('active');
-            
-            // Refresh data if switching to view tab
-            if (tabName === 'view-data' && allData.length > 0) {
-                updateDataDisplay();
-            }
-            
-            // Update info tab stats
-            if (tabName === 'info') {
-                updateInfoStats();
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+
+            // Load data if switching to view tab
+            if (tabName === 'view' && allData.length === 0) {
+                loadAllData();
+            } else if (tabName === 'analytics') {
+                updateAnalytics();
             }
         }
 
+        function showAlert(containerId, message, type = 'info') {
+            const alertDiv = document.getElementById(containerId);
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.display = 'flex';
+            
+            if (type !== 'info') {
+                setTimeout(() => {
+                    alertDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function showLoading(show) {
+            const loadingDiv = document.getElementById('data-loading');
+            const dataDiv = document.getElementById('data-container');
+            
+            if (loadingDiv) loadingDiv.style.display = show ? 'flex' : 'none';
+            if (dataDiv) dataDiv.style.display = show ? 'none' : 'block';
+        }
+
         // ============================================
-        // LOGIN FUNCTION
+        // LOGIN SYSTEM
         // ============================================
         async function login() {
-            const pinInput = document.getElementById('pin-input');
-            const pin = pinInput.value.trim();
-            const alertDiv = document.getElementById('login-alert');
-            
+            const pin = document.getElementById('pin-input').value.trim();
             if (!pin) {
-                showAlert(alertDiv, 'Please enter your PIN', 'error');
+                showAlert('login-alert', 'Please enter your PIN', 'error');
                 return;
             }
-            
-            showAlert(alertDiv, 'Verifying your access...', 'info');
-            showLoading(true);
-            
+
+            showAlert('login-alert', 'Verifying your credentials...', 'info');
+
             try {
-                // Encrypt PIN and check against admin database
+                // Encrypt PIN for security
                 const encryptedPin = encrypt(pin);
                 
+                // Verify PIN against admin database
                 const response = await fetch(
-                    `${ADMIN_PROJECT.url}/rest/v1/admin_public?pin_enc=eq.${encodeURIComponent(encryptedPin)}`,
+                    `${ADMIN_CONFIG.url}/rest/v1/admin_public?pin_enc=eq.${encodeURIComponent(encryptedPin)}`,
                     {
                         headers: {
-                            'apikey': ADMIN_PROJECT.key,
-                            'Authorization': `Bearer ${ADMIN_PROJECT.key}`
+                            'apikey': ADMIN_CONFIG.key,
+                            'Authorization': `Bearer ${ADMIN_CONFIG.key}`
                         }
                     }
                 );
+
+                if (!response.ok) throw new Error('Connection failed');
                 
-                if (!response.ok) throw new Error('Network error');
-                
-                const data = await response.json();
-                
-                if (data.length === 0) {
-                    showAlert(alertDiv, 'Invalid PIN. Please try again.', 'error');
-                    showLoading(false);
-                    return;
+                const users = await response.json();
+                if (users.length === 0) throw new Error('Invalid PIN');
+
+                // Get user project configuration
+                const user = users[0];
+                const projectUrl = decrypt(user.url_enc);
+                const projectKey = decrypt(user.key_enc);
+
+                if (!projectUrl || !projectKey) {
+                    throw new Error('Configuration error');
                 }
-                
-                // Decrypt and store configuration
-                const adminRecord = data[0];
-                const decryptedUrl = decrypt(adminRecord.url_enc);
-                const decryptedKey = decrypt(adminRecord.key_enc);
-                
-                currentConfig = {
-                    url: decryptedUrl,
-                    key: decryptedKey,
-                    table: 'family_data_responses_gsheet'
+
+                // Store user session
+                currentUser = {
+                    pin: pin,
+                    name: `User ${pin}`,
+                    config: {
+                        url: projectUrl,
+                        key: projectKey,
+                        table: ADMIN_CONFIG.table
+                    }
                 };
-                currentPin = pin;
-                
+
                 // Update UI
-                showAlert(alertDiv, 'Access granted! Loading your data...', 'success');
+                document.getElementById('user-name').textContent = currentUser.name;
+                
+                // Show success and switch to app
+                showAlert('login-alert', 'Login successful! Redirecting...', 'success');
                 
                 setTimeout(() => {
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('app-container').style.display = 'block';
-                    loadData();
+                    loadAllData();
+                    document.getElementById('dated').valueAsDate = new Date();
                 }, 1000);
-                
+
             } catch (error) {
-                showAlert(alertDiv, 'Connection failed. Please try again.', 'error');
-                showLoading(false);
-                console.error('Login error:', error);
+                showAlert('login-alert', error.message === 'Invalid PIN' ? 'Invalid PIN entered' : 'Connection error. Please try again.', 'error');
             }
         }
 
         // ============================================
-        // DATA LOADING
+        // DATA MANAGEMENT
         // ============================================
-        async function loadData() {
-            if (!currentConfig) return;
-            
-            showDataLoading(true);
-            
-            try {
-                // Load recent data (last 50 entries)
-                const response = await fetch(
-                    `${currentConfig.url}/rest/v1/${currentConfig.table}?order=timestamp.desc&limit=50`,
-                    {
-                        headers: {
-                            'apikey': currentConfig.key,
-                            'Authorization': `Bearer ${currentConfig.key}`
-                        }
-                    }
-                );
-                
-                if (!response.ok) throw new Error('Failed to load data');
-                
-                allData = await response.json();
-                
-                // Update displays
-                updateDataDisplay();
-                updateInfoStats();
-                
-                showAlert(document.getElementById('data-alert'), `Loaded ${allData.length} recent entries`, 'success');
-                
-            } catch (error) {
-                showAlert(document.getElementById('data-alert'), 'Failed to load data', 'error');
-                console.error('Data loading error:', error);
-            } finally {
-                showDataLoading(false);
-            }
-        }
-
         async function loadAllData() {
-            showDataLoading(true);
+            if (!currentUser) return;
             
+            showLoading(true);
+            showAlert('data-alert', 'Loading your purchase history...', 'info');
+
             try {
-                let offset = 0;
+                // Load all data using pagination
+                const batchSize = 1000;
                 allData = [];
-                
-                while (true) {
+                let offset = 0;
+                let hasMore = true;
+
+                while (hasMore) {
                     const response = await fetch(
-                        `${currentConfig.url}/rest/v1/${currentConfig.table}?order=timestamp.desc&limit=1000&offset=${offset}`,
+                        `${currentUser.config.url}/rest/v1/${currentUser.config.table}?order=dated.desc&limit=${batchSize}&offset=${offset}`,
                         {
                             headers: {
-                                'apikey': currentConfig.key,
-                                'Authorization': `Bearer ${currentConfig.key}`
+                                'apikey': currentUser.config.key,
+                                'Authorization': `Bearer ${currentUser.config.key}`
                             }
                         }
                     );
+
+                    if (!response.ok) throw new Error('Failed to load data');
                     
-                    if (!response.ok) break;
+                    const batch = await response.json();
+                    allData = allData.concat(batch);
                     
-                    const pageData = await response.json();
-                    if (pageData.length === 0) break;
-                    
-                    allData = allData.concat(pageData);
-                    offset += pageData.length;
-                    
-                    // Safety limit
-                    if (allData.length > 5000) break;
+                    if (batch.length < batchSize) hasMore = false;
+                    else offset += batchSize;
                 }
-                
-                updateDataDisplay();
-                updateInfoStats();
-                
-                showAlert(document.getElementById('data-alert'), `Loaded all ${allData.length} entries`, 'success');
-                
+
+                // Update UI
+                updateStats();
+                renderData();
+                showAlert('data-alert', `Loaded ${allData.length} records successfully`, 'success');
+
             } catch (error) {
-                showAlert(document.getElementById('data-alert'), 'Failed to load all data', 'error');
+                showAlert('data-alert', 'Error loading data. Please try again.', 'error');
             } finally {
-                showDataLoading(false);
+                showLoading(false);
+            }
+        }
+
+        function updateStats() {
+            // Basic stats
+            document.getElementById('total-records').textContent = allData.length;
+            document.getElementById('unique-users').textContent = new Set(allData.map(d => d.filled_by)).size;
+            
+            // Today's records
+            const today = new Date().toISOString().split('T')[0];
+            const todayCount = allData.filter(d => d.dated && d.dated.startsWith(today)).length;
+            document.getElementById('today-records').textContent = todayCount;
+            
+            // Total amount
+            const totalAmount = allData.reduce((sum, d) => sum + (parseFloat(d.approximately_amount) || 0), 0);
+            document.getElementById('total-amount').textContent = `₹${totalAmount.toLocaleString('en-IN')}`;
+        }
+
+        function renderData() {
+            const tbody = document.getElementById('data-body');
+            const totalPages = Math.ceil(allData.length / recordsPerPage);
+            const startIndex = (currentPage - 1) * recordsPerPage;
+            const endIndex = Math.min(startIndex + recordsPerPage, allData.length);
+            const pageData = allData.slice(startIndex, endIndex);
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-light);">
+                            <i class="fas fa-inbox" style="font-size: 48px; opacity: 0.5; margin-bottom: 15px;"></i>
+                            <div>No purchase records found</div>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = pageData.map(item => `
+                    <tr>
+                        <td><strong>${item.forms_sr_no || '-'}</strong></td>
+                        <td>${item.dated ? new Date(item.dated).toLocaleDateString('en-IN') : '-'}</td>
+                        <td>${item.filled_by || '-'}</td>
+                        <td>
+                            <span class="badge ${item.home_items_related ? 'badge-success' : 'badge-warning'}">
+                                ${item.home_items_related || 'Uncategorized'}
+                            </span>
+                        </td>
+                        <td><strong>₹${(parseFloat(item.approximately_amount) || 0).toFixed(2)}</strong></td>
+                        <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            ${item.todays_select_items_to_buy || '-'}
+                        </td>
+                        <td>
+                            <button class="btn btn-icon btn-secondary" onclick="viewDetails(${item.id})" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // Update pagination
+            document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages}`;
+            document.getElementById('prev-page').disabled = currentPage <= 1;
+            document.getElementById('next-page').disabled = currentPage >= totalPages;
+        }
+
+        function changePage(delta) {
+            const newPage = currentPage + delta;
+            const totalPages = Math.ceil(allData.length / recordsPerPage);
+            
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                renderData();
             }
         }
 
         // ============================================
         // FORM SUBMISSION
         // ============================================
-        async function submitForm() {
-            const filledBy = document.getElementById('filled_by').value.trim();
-            const itemsList = document.getElementById('items_list').value.trim();
-            const amount = document.getElementById('amount').value.trim();
-            const alertDiv = document.getElementById('form-alert');
+        document.getElementById('purchase-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            // Validation
-            if (!filledBy || !itemsList || !amount) {
-                showAlert(alertDiv, 'Please fill in all required fields', 'error');
+            if (!currentUser) {
+                showAlert('form-alert', 'Please login first', 'error');
                 return;
             }
-            
-            if (isNaN(amount) || parseFloat(amount) <= 0) {
-                showAlert(alertDiv, 'Please enter a valid amount', 'error');
-                return;
-            }
-            
-            userName = filledBy;
-            document.querySelector('.user-avatar i').className = 'fas fa-user-check';
-            
-            showAlert(alertDiv, 'Saving your entry...', 'info');
-            
+
+            // Collect form data
+            const formData = {
+                forms_sr_no: document.getElementById('forms_sr_no').value,
+                dated: document.getElementById('dated').value,
+                filled_by: document.getElementById('filled_by').value,
+                home_items_related: document.getElementById('home_items_related').value,
+                todays_select_items_to_buy: document.getElementById('todays_select_items_to_buy').value,
+                approximately_amount: document.getElementById('approximately_amount').value,
+                special_event: document.getElementById('special_event').value,
+                food_activity_details: document.getElementById('food_activity_details').value,
+                all_items_list: document.getElementById('all_items_list').value,
+                comments_about_today_purchase: document.getElementById('comments_about_today_purchase').value,
+                timestamp: new Date().toISOString(),
+                love_count: 0
+            };
+
+            showAlert('form-alert', 'Saving your purchase entry...', 'info');
+
             try {
-                // Prepare data
-                const formData = {
-                    filled_by: filledBy,
-                    todays_select_items_to_buy: itemsList,
-                    approximately_amount: parseFloat(amount),
-                    comments_about_today_purchase: document.getElementById('comments').value.trim(),
-                    "1. Today's Paste all items of list here.": document.getElementById('detailed_items').value.trim(),
-                    "2. Today's select home items related to?": document.getElementById('category').value,
-                    "6. Approximately Amount": parseFloat(amount),
-                    "Love Count": parseInt(document.getElementById('love_count').value) || 0,
-                    "Special event or activity": document.getElementById('special_event').value,
-                    "Food activity details": document.getElementById('food_activity').value,
-                    timestamp: new Date().toISOString(),
-                    dated: new Date().toISOString().split('T')[0],
-                    forms_sr_no: `ENTRY-${Date.now().toString().slice(-6)}`
-                };
-                
-                // Submit to database
                 const response = await fetch(
-                    `${currentConfig.url}/rest/v1/${currentConfig.table}`,
+                    `${currentUser.config.url}/rest/v1/${currentUser.config.table}`,
                     {
                         method: 'POST',
                         headers: {
-                            'apikey': currentConfig.key,
-                            'Authorization': `Bearer ${currentConfig.key}`,
+                            'apikey': currentUser.config.key,
+                            'Authorization': `Bearer ${currentUser.config.key}`,
                             'Content-Type': 'application/json',
                             'Prefer': 'return=representation'
                         },
                         body: JSON.stringify(formData)
                     }
                 );
+
+                if (!response.ok) throw new Error('Save failed');
                 
-                if (!response.ok) throw new Error('Submission failed');
+                const savedData = await response.json();
                 
                 // Add to local data
-                const newRecord = await response.json();
-                allData.unshift(newRecord[0]);
+                allData.unshift(savedData[0]);
                 
-                // Clear form
-                clearForm();
+                // Reset form
+                this.reset();
+                document.getElementById('dated').valueAsDate = new Date();
                 
-                // Update display
-                updateDataDisplay();
-                updateInfoStats();
+                // Update UI
+                updateStats();
+                renderData();
+                showAlert('form-alert', 'Purchase entry saved successfully!', 'success');
                 
-                // Show success and switch to view tab
-                showAlert(alertDiv, 'Entry saved successfully!', 'success');
-                setTimeout(() => {
-                    switchTab('view-data');
-                }, 1000);
-                
+                // Switch to view tab
+                switchTab('view');
+
             } catch (error) {
-                showAlert(alertDiv, 'Failed to save entry. Please try again.', 'error');
-                console.error('Submit error:', error);
+                showAlert('form-alert', 'Error saving entry. Please try again.', 'error');
             }
-        }
-
-        function clearForm() {
-            document.getElementById('filled_by').value = '';
-            document.getElementById('items_list').value = '';
-            document.getElementById('detailed_items').value = '';
-            document.getElementById('amount').value = '';
-            document.getElementById('comments').value = '';
-            document.getElementById('love_count').value = '0';
-            document.getElementById('category').value = '';
-            document.getElementById('special_event').value = '';
-            document.getElementById('food_activity').value = '';
-        }
-
-        function updateLoveCount(change) {
-            const input = document.getElementById('love_count');
-            let value = parseInt(input.value) || 0;
-            value = Math.max(0, value + change);
-            input.value = value;
-        }
+        });
 
         // ============================================
-        // DATA DISPLAY FUNCTIONS
+        // ANALYTICS FUNCTIONS
         // ============================================
-        function updateDataDisplay() {
+        function updateAnalytics() {
             if (allData.length === 0) return;
+
+            // Calculate analytics
+            const totalItems = allData.reduce((sum, d) => {
+                return sum + (d.todays_select_items_to_buy ? d.todays_select_items_to_buy.split('\n').length : 0);
+            }, 0);
             
+            const foodActivities = allData.filter(d => d.food_activity_details).length;
+            const specialEvents = allData.filter(d => d.special_event).length;
+            const totalComments = allData.filter(d => d.comments_about_today_purchase).length;
+
             // Update stats
-            updateStats();
-            
-            // Update table
-            updateTable();
-        }
+            document.getElementById('total-items').textContent = totalItems;
+            document.getElementById('food-activities').textContent = foodActivities;
+            document.getElementById('special-events').textContent = specialEvents;
+            document.getElementById('total-comments').textContent = totalComments;
 
-        function updateStats() {
-            const totalAmount = allData.reduce((sum, item) => sum + (parseFloat(item.approximately_amount) || 0), 0);
-            const today = new Date().toISOString().split('T')[0];
-            const todayCount = allData.filter(item => (item.dated || '').split('T')[0] === today).length;
-            const uniqueUsers = [...new Set(allData.map(item => item.filled_by).filter(Boolean))];
-            
-            document.getElementById('total-records').textContent = allData.length.toLocaleString();
-            document.getElementById('total-amount').textContent = '₹' + totalAmount.toFixed(2);
-            document.getElementById('today-records').textContent = todayCount;
-            document.getElementById('unique-users').textContent = uniqueUsers.length;
-        }
-
-        function updateTable() {
-            const dataBody = document.getElementById('data-body');
-            
-            if (allData.length === 0) {
-                dataBody.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">
-                            <i class="fas fa-receipt"></i>
-                        </div>
-                        <p>No entries yet</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Show recent 10 entries
-            const recentData = allData.slice(0, 10);
-            
-            dataBody.innerHTML = recentData.map((item, index) => `
-                <div class="table-row">
-                    <div class="table-cell">${index + 1}</div>
-                    <div class="table-cell">${formatDate(item.timestamp || item.dated)}</div>
-                    <div class="table-cell">
-                        <div style="font-weight: 500;">${item.filled_by || 'Unknown'}</div>
-                        <div style="font-size: 12px; color: var(--gray); margin-top: 3px;">
-                            ${truncateText(item.todays_select_items_to_buy || '', 30)}
+            // Update recent activity
+            const recentActivity = allData.slice(0, 5).map(item => `
+                <div style="padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-weight: 600;">${item.filled_by || 'Unknown'}</div>
+                        <div style="font-size: 14px; color: var(--text-light);">
+                            ${item.todays_select_items_to_buy ? item.todays_select_items_to_buy.split('\n')[0] : 'No items listed'}
                         </div>
                     </div>
-                    <div class="table-cell amount">₹${(parseFloat(item.approximately_amount) || 0).toFixed(2)}</div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: 600; color: var(--primary);">₹${(parseFloat(item.approximately_amount) || 0).toFixed(2)}</div>
+                        <div style="font-size: 12px; color: var(--text-light);">
+                            ${item.dated ? new Date(item.dated).toLocaleDateString('en-IN') : ''}
+                        </div>
+                    </div>
                 </div>
             `).join('');
-        }
 
-        function updateInfoStats() {
-            if (allData.length === 0) return;
-            
-            const totalAmount = allData.reduce((sum, item) => sum + (parseFloat(item.approximately_amount) || 0), 0);
-            const avgAmount = totalAmount / allData.length;
-            const uniqueDays = [...new Set(allData.map(item => (item.dated || '').split('T')[0]).filter(Boolean))].length;
-            
-            document.getElementById('info-total-entries').textContent = allData.length.toLocaleString();
-            document.getElementById('info-total-amount').textContent = '₹' + totalAmount.toFixed(2);
-            document.getElementById('info-avg-amount').textContent = '₹' + avgAmount.toFixed(2);
-            document.getElementById('info-total-days').textContent = uniqueDays;
+            document.getElementById('recent-activity').innerHTML = recentActivity || '<div style="padding: 40px; text-align: center; color: var(--text-light);">No recent activity</div>';
+
+            // Update category chart
+            const categories = {};
+            allData.forEach(item => {
+                const category = item.home_items_related || 'Uncategorized';
+                categories[category] = (categories[category] || 0) + 1;
+            });
+
+            const categoryChart = Object.entries(categories)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 5)
+                .map(([category, count]) => `
+                    <div style="margin-bottom: 10px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>${category}</span>
+                            <span style="font-weight: 600;">${count}</span>
+                        </div>
+                        <div style="height: 8px; background: var(--border); border-radius: 4px; overflow: hidden;">
+                            <div style="height: 100%; background: var(--primary); width: ${(count / allData.length * 100)}%; border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                `).join('');
+
+            document.getElementById('category-chart').innerHTML = categoryChart || '<div style="padding: 40px; text-align: center; color: var(--text-light);">No category data</div>';
         }
 
         // ============================================
         // UTILITY FUNCTIONS
         // ============================================
-        function showAlert(element, message, type) {
-            element.textContent = message;
-            element.className = `alert alert-${type}`;
-            element.style.display = 'block';
-            
-            setTimeout(() => {
-                element.style.display = 'none';
-            }, type === 'error' ? 5000 : 3000);
-        }
-
-        function showLoading(show) {
-            // For login screen
-            const btn = document.querySelector('#login-screen .btn');
-            if (btn) {
-                btn.innerHTML = show ? 
-                    '<i class="fas fa-spinner fa-spin"></i> Verifying...' : 
-                    '<i class="fas fa-sign-in-alt"></i> Access Dashboard';
-                btn.disabled = show;
-            }
-        }
-
-        function showDataLoading(show) {
-            document.getElementById('data-loading').style.display = show ? 'block' : 'none';
-            document.getElementById('data-content').style.display = show ? 'none' : 'block';
-        }
-
-        function formatDate(dateString) {
-            if (!dateString) return '-';
-            try {
-                const date = new Date(dateString);
-                return date.toLocaleDateString('en-IN', { 
-                    day: '2-digit', 
-                    month: 'short' 
-                });
-            } catch {
-                return dateString;
-            }
-        }
-
-        function truncateText(text, maxLength) {
-            if (!text) return '';
-            if (text.length <= maxLength) return text;
-            return text.substring(0, maxLength) + '...';
-        }
-
-        // ============================================
-        // CONTROL FUNCTIONS
-        // ============================================
         function refreshData() {
-            loadData();
-        }
-
-        function showAllData() {
             loadAllData();
         }
 
-        async function exportData() {
+        function exportData() {
             if (allData.length === 0) {
-                showAlert(document.getElementById('data-alert'), 'No data to export', 'error');
+                showAlert('data-alert', 'No data to export', 'error');
                 return;
             }
+
+            const headers = ['SR No', 'Date', 'Filled By', 'Category', 'Items', 'Amount', 'Special Event', 'Food Activity', 'Comments'];
+            const csv = [
+                headers.join(','),
+                ...allData.map(item => [
+                    item.forms_sr_no,
+                    item.dated,
+                    item.filled_by,
+                    item.home_items_related,
+                    `"${(item.todays_select_items_to_buy || '').replace(/"/g, '""')}"`,
+                    item.approximately_amount,
+                    item.special_event,
+                    item.food_activity_details,
+                    `"${(item.comments_about_today_purchase || '').replace(/"/g, '""')}"`
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `purchase_data_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
             
-            try {
-                // Create CSV
-                const headers = ['Date', 'Filled By', 'Category', 'Items', 'Amount', 'Comments'];
-                const csv = [
-                    headers.join(','),
-                    ...allData.map(item => [
-                        item.dated || '',
-                        `"${(item.filled_by || '').replace(/"/g, '""')}"`,
-                        `"${(item["2. Today's select home items related to?"] || '').replace(/"/g, '""')}"`,
-                        `"${(item.todays_select_items_to_buy || '').replace(/"/g, '""')}"`,
-                        item.approximately_amount || '',
-                        `"${(item.comments_about_today_purchase || '').replace(/"/g, '""')}"`
-                    ].join(','))
-                ].join('\n');
-                
-                // Download
-                const blob = new Blob([csv], { type: 'text/csv' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `family_expenses_${new Date().toISOString().split('T')[0]}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                showAlert(document.getElementById('data-alert'), `Exported ${allData.length} entries`, 'success');
-                
-            } catch (error) {
-                showAlert(document.getElementById('data-alert'), 'Export failed', 'error');
-            }
+            showAlert('data-alert', 'Data exported successfully!', 'success');
+        }
+
+        function viewDetails(id) {
+            const item = allData.find(d => d.id === id);
+            if (!item) return;
+
+            alert(`
+📋 Purchase Details:
+
+Serial Number: ${item.forms_sr_no || '-'}
+Date: ${item.dated ? new Date(item.dated).toLocaleDateString('en-IN') : '-'}
+Filled By: ${item.filled_by || '-'}
+Category: ${item.home_items_related || '-'}
+Amount: ₹${(parseFloat(item.approximately_amount) || 0).toFixed(2)}
+
+Items to Buy:
+${item.todays_select_items_to_buy || 'No items listed'}
+
+Special Event: ${item.special_event || 'None'}
+Food Activity: ${item.food_activity_details || 'None'}
+
+Comments:
+${item.comments_about_today_purchase || 'No comments'}
+            `);
         }
 
         function logout() {
-            // Clear all data
-            currentConfig = null;
-            currentPin = '';
-            allData = [];
-            userName = '';
-            
-            // Reset UI
-            document.getElementById('login-screen').style.display = 'block';
-            document.getElementById('app-container').style.display = 'none';
-            document.getElementById('pin-input').value = '';
-            document.getElementById('login-alert').style.display = 'none';
-            
-            // Reset tabs
-            document.querySelectorAll('.tab').forEach((tab, index) => {
-                tab.classList.remove('active');
-                if (index === 0) tab.classList.add('active');
-            });
-            document.querySelectorAll('.tab-content').forEach((content, index) => {
-                content.classList.remove('active');
-                if (index === 0) content.classList.add('active');
-            });
-            
-            // Reset form
-            clearForm();
-            
-            // Reset user avatar
-            document.querySelector('.user-avatar i').className = 'fas fa-user';
+            if (confirm('Are you sure you want to logout?')) {
+                currentUser = null;
+                allData = [];
+                document.getElementById('pin-input').value = '';
+                document.getElementById('login-screen').style.display = 'block';
+                document.getElementById('app-container').style.display = 'none';
+                document.getElementById('login-alert').style.display = 'none';
+            }
         }
 
         // ============================================
         // INITIALIZATION
         // ============================================
-        document.addEventListener('DOMContentLoaded', function() {
-            // Enter key for login
-            document.getElementById('pin-input').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') login();
-            });
-            
-            // Auto-hide alerts
-            document.querySelectorAll('.alert').forEach(alert => {
-                setTimeout(() => {
-                    alert.style.display = 'none';
-                }, 5000);
-            });
-            
-            // File upload preview
-            document.getElementById('file_upload').addEventListener('change', function(e) {
-                if (this.files.length > 0) {
-                    const file = this.files[0];
-                    const alertDiv = document.getElementById('form-alert');
-                    showAlert(alertDiv, `File selected: ${file.name}`, 'success');
-                }
-            });
+        // Set today's date as default
+        document.getElementById('dated').valueAsDate = new Date();
+        
+        // Allow Enter key to login
+        document.getElementById('pin-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
         });
+        
+        // Auto-focus PIN input
+        document.getElementById('pin-input').focus();
     </script>
 </body>
 </html>
