@@ -10,6 +10,7 @@ class DataService {
 
     async fetchAllData() {
         try {
+            // Load all records using pagination (1000 records per batch)
             const batchSize = 1000;
             this.allData = [];
             let offset = 0;
@@ -26,27 +27,44 @@ class DataService {
                     }
                 );
                 
-                if (!response.ok) throw new Error(`Failed to fetch: ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch data: ${response.status}`);
+                }
+                
                 const batchData = await response.json();
                 this.allData = this.allData.concat(batchData);
                 
-                if (batchData.length < batchSize) hasMore = false;
-                else {
+                if (batchData.length < batchSize) {
+                    hasMore = false;
+                } else {
                     offset += batchSize;
+                    // Small delay to prevent rate limiting
                     await new Promise(resolve => setTimeout(resolve, 100));
                 }
             }
             
+            // Update pagination
             this.totalRecords = this.allData.length;
             this.totalPages = Math.ceil(this.totalRecords / this.recordsPerPage);
-            return { success: true, data: this.allData, totalRecords: this.totalRecords };
+            
+            return {
+                success: true,
+                data: this.allData,
+                totalRecords: this.totalRecords
+            };
+            
         } catch (error) {
-            return { success: false, error: error.message };
+            console.error('Data fetch error:', error);
+            return {
+                success: false,
+                error: error.message
+            };
         }
     }
 
     getPageData(page = 1) {
         this.currentPage = Math.max(1, Math.min(page, this.totalPages));
+        
         const startIndex = (this.currentPage - 1) * this.recordsPerPage;
         const endIndex = Math.min(startIndex + this.recordsPerPage, this.totalRecords);
         
@@ -62,7 +80,9 @@ class DataService {
 
     async createRecord(data) {
         try {
+            // Add timestamp
             data.timestamp = new Date().toISOString();
+            
             const response = await fetch(
                 `${this.config.url}/rest/v1/${this.config.table}`,
                 {
@@ -77,15 +97,28 @@ class DataService {
                 }
             );
             
-            if (!response.ok) throw new Error(`Failed to save: ${response.status}`);
+            if (!response.ok) {
+                throw new Error(`Failed to create: ${response.status}`);
+            }
+            
             const savedData = await response.json();
             
+            // Add to local data
             this.allData.unshift(savedData[0]);
             this.totalRecords++;
             this.totalPages = Math.ceil(this.totalRecords / this.recordsPerPage);
-            return { success: true, data: savedData[0] };
+            
+            return {
+                success: true,
+                data: savedData[0]
+            };
+            
         } catch (error) {
-            return { success: false, error: error.message };
+            console.error('Create error:', error);
+            return {
+                success: false,
+                error: error.message
+            };
         }
     }
 
@@ -102,18 +135,33 @@ class DataService {
                 }
             );
             
-            if (!response.ok) throw new Error(`Failed to delete: ${response.status}`);
+            if (!response.ok) {
+                throw new Error(`Failed to delete: ${response.status}`);
+            }
+            
+            // Remove from local data
             this.allData = this.allData.filter(item => item.id !== id);
             this.totalRecords--;
             this.totalPages = Math.ceil(this.totalRecords / this.recordsPerPage);
-            return { success: true };
+            
+            return {
+                success: true
+            };
+            
         } catch (error) {
-            return { success: false, error: error.message };
+            console.error('Delete error:', error);
+            return {
+                success: false,
+                error: error.message
+            };
         }
     }
 
     exportToCSV() {
-        if (this.allData.length === 0) return null;
+        if (this.allData.length === 0) {
+            return null;
+        }
+        
         const headers = ['SR No', 'Date', 'Filled By', 'Items', 'Amount', 'Comments'];
         const csv = [
             headers.join(','),
@@ -126,17 +174,27 @@ class DataService {
                 `"${(item.comments_about_today_purchase || '').replace(/"/g, '""')}"`
             ].join(','))
         ].join('\n');
+        
         return csv;
     }
 
     getStatistics() {
         const today = new Date().toISOString().split('T')[0];
+        
+        // Today's records
         const todayCount = this.allData.filter(item => {
             if (!item.dated) return false;
-            return new Date(item.dated).toISOString().split('T')[0] === today;
+            const itemDate = new Date(item.dated).toISOString().split('T')[0];
+            return itemDate === today;
         }).length;
         
-        const totalAmount = this.allData.reduce((sum, item) => sum + (parseFloat(item.approximately_amount) || 0), 0);
+        // Total amount
+        const totalAmount = this.allData.reduce((sum, item) => {
+            const amount = parseFloat(item.approximately_amount) || 0;
+            return sum + amount;
+        }, 0);
+        
+        // Unique users
         const uniqueUsers = [...new Set(this.allData.map(item => item.filled_by).filter(Boolean))];
         
         return {
@@ -148,14 +206,20 @@ class DataService {
     }
 }
 
+// Create global instance
 let dataService = null;
+
+// Initialize data service
 function initDataService(config) {
     dataService = new DataService(config);
     return dataService;
 }
+
+// Get data service instance
 function getDataService() {
     return dataService;
 }
 
+// Make functions available globally
 window.initDataService = initDataService;
 window.getDataService = getDataService;
