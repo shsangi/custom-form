@@ -2,24 +2,35 @@
     <div class="card">
         <div class="header">
             <h1>📊 Family Data Manager</h1>
-            <div style="display: flex; gap: 10px;">
-                <button onclick="window.location.hash='#form'" class="btn-success">📝 New Entry</button>
-                <button id="logout-btn" class="btn-secondary">👋 Logout</button>
+            <div class="d-flex gap-10">
+                <button onclick="window.location.hash='#form'" class="btn-success">
+                    📝 New Entry
+                </button>
+                <button id="logout-btn" class="btn-secondary">
+                    👋 Logout
+                </button>
             </div>
         </div>
         
+        <!-- Tabs -->
         <div class="tabs">
-            <button class="tab-btn active" data-tab="view-data">📊 View Data</button>
-            <button class="tab-btn" data-tab="info">ℹ️ Info</button>
+            <button class="tab-btn active" data-tab="view-data">
+                📊 View Data
+            </button>
+            <button class="tab-btn" data-tab="info">
+                ℹ️ Info
+            </button>
         </div>
         
+        <!-- View Data Tab -->
         <div id="view-data-tab" class="tab-content active">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div class="d-flex justify-between align-center">
                 <h2 style="color: #1e293b;">📊 View All Data</h2>
                 <div class="page-info" id="page-info">Loading...</div>
             </div>
             
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+            <!-- Connection Info -->
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; margin: 20px 0;">
                 <div class="info-item">
                     <span class="info-label">Connected To:</span>
                     <span class="info-value" id="connected-url">Loading...</span>
@@ -30,16 +41,31 @@
                 </div>
             </div>
             
+            <!-- Stats -->
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-number" id="total-records">0</div><div class="stat-label">Total Records</div></div>
-                <div class="stat-card"><div class="stat-number" id="today-records">0</div><div class="stat-label">Today's Records</div></div>
-                <div class="stat-card"><div class="stat-number" id="total-amount">₹0</div><div class="stat-label">Total Amount</div></div>
-                <div class="stat-card"><div class="stat-number" id="unique-users">0</div><div class="stat-label">Unique Users</div></div>
+                <div class="stat-card">
+                    <div class="stat-number" id="total-records">0</div>
+                    <div class="stat-label">Total Records</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="today-records">0</div>
+                    <div class="stat-label">Today's Records</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="total-amount">₹0</div>
+                    <div class="stat-label">Total Amount</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="unique-users">0</div>
+                    <div class="stat-label">Unique Users</div>
+                </div>
             </div>
             
+            <!-- Data Table -->
             <div id="data-loading" class="loading-screen">
                 <div class="loading-spinner"></div>
                 <p>Loading data from your project...</p>
+                <p id="loading-progress" style="font-size: 14px; margin-top: 10px;"></p>
             </div>
             
             <div id="data-container">
@@ -47,46 +73,133 @@
                     <table class="data-table" id="data-table">
                         <thead>
                             <tr>
-                                <th>SR No</th><th>Date</th><th>Filled By</th><th>Items</th><th>Amount</th><th>Comments</th><th>Actions</th>
+                                <th>SR No</th>
+                                <th>Date</th>
+                                <th>Filled By</th>
+                                <th>Items</th>
+                                <th>Amount</th>
+                                <th>Comments</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="data-body"></tbody>
+                        <tbody id="data-body">
+                            <!-- Data will be loaded here -->
+                        </tbody>
                     </table>
                 </div>
                 
+                <!-- Pagination -->
                 <div class="pagination">
-                    <button class="pagination-btn" id="prev-page" disabled>← Previous</button>
+                    <button class="pagination-btn" id="prev-page" disabled>
+                        ← Previous
+                    </button>
                     <span class="page-info" id="page-display">Page 1 of 1</span>
-                    <button class="pagination-btn" id="next-page" disabled>Next →</button>
+                    <button class="pagination-btn" id="next-page" disabled>
+                        Next →
+                    </button>
                 </div>
             </div>
             
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button id="refresh-btn" class="btn">🔄 Refresh Data</button>
-                <button id="export-btn" class="btn-secondary">📥 Export CSV</button>
+            <!-- Controls -->
+            <div class="d-flex gap-10 mt-20">
+                <button id="refresh-btn" class="btn">
+                    🔄 Refresh Data
+                </button>
+                <button id="export-btn" class="btn-secondary">
+                    📥 Export CSV
+                </button>
             </div>
             
-            <div id="data-alert" class="alert"></div>
+            <div id="data-alert" class="alert mt-20"></div>
         </div>
         
+        <!-- Info Tab -->
         <div id="info-tab" class="tab-content">
             <h2 style="margin-bottom: 25px; color: #1e293b;">ℹ️ Connection Information</h2>
+            
             <div class="info-grid">
+                <!-- Login Info Card -->
                 <div class="info-card">
                     <h3>🔐 Login Details</h3>
-                    <div class="info-item"><span class="info-label">Entered PIN:</span><span class="info-value" id="info-pin">-</span></div>
-                    <div class="info-item"><span class="info-label">Encrypted PIN:</span><span class="info-value" id="info-encrypted-pin">-</span></div>
+                    <div class="info-item">
+                        <span class="info-label">Entered PIN:</span>
+                        <span class="info-value" id="info-pin">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Encrypted PIN:</span>
+                        <span class="info-value" id="info-encrypted-pin">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Admin Project:</span>
+                        <span class="info-value">kmtrpnkftfqkthlgfwob.supabase.co</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Admin Table:</span>
+                        <span class="info-value">admin_public</span>
+                    </div>
                 </div>
+                
+                <!-- Project Info Card -->
                 <div class="info-card">
                     <h3>🌐 Project Connection</h3>
-                    <div class="info-item"><span class="info-label">Connected URL:</span><span class="info-value" id="info-url">-</span></div>
-                    <div class="info-item"><span class="info-label">API Key:</span><span class="info-value" id="info-api-key">-</span></div>
+                    <div class="info-item">
+                        <span class="info-label">Connected URL:</span>
+                        <span class="info-value" id="info-url">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">API Key:</span>
+                        <span class="info-value" id="info-api-key">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Target Table:</span>
+                        <span class="info-value">family_data_responses_gsheet</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Total Records:</span>
+                        <span class="info-value" id="info-total-records">0</span>
+                    </div>
                 </div>
+                
+                <!-- Encryption Demo Card -->
                 <div class="info-card">
-                    <h3>📊 Load Strategy</h3>
-                    <div class="info-item"><span class="info-label">Current Page:</span><span class="info-value" id="current-page-info">1</span></div>
-                    <div class="info-item"><span class="info-label">Total Pages:</span><span class="info-value" id="total-pages-info">1</span></div>
-                    <div class="info-item"><span class="info-label">Records in Memory:</span><span class="info-value" id="memory-records">0</span></div>
+                    <h3>🔒 Encryption Demo</h3>
+                    <div class="info-item">
+                        <span class="info-label">Original URL:</span>
+                        <span class="info-value" id="original-url">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Encrypted URL:</span>
+                        <span class="info-value" id="encrypted-url">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Original Key:</span>
+                        <span class="info-value" id="original-key">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Encrypted Key:</span>
+                        <span class="info-value" id="encrypted-key">-</span>
+                    </div>
+                </div>
+                
+                <!-- Load Strategy Card -->
+                <div class="info-card">
+                    <h3>📊 Data Loading Strategy</h3>
+                    <div class="info-item">
+                        <span class="info-label">Pagination:</span>
+                        <span class="info-value">1000 records per request</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Current Page:</span>
+                        <span class="info-value" id="current-page-info">1</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Total Pages:</span>
+                        <span class="info-value" id="total-pages-info">1</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Records in Memory:</span>
+                        <span class="info-value" id="memory-records">0</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -94,6 +207,7 @@
 </div>
 
 <script>
+    // Set connected URL
     document.addEventListener('DOMContentLoaded', () => {
         const config = window.AuthService?.getCurrentConfig();
         if (config) {
