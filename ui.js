@@ -2,80 +2,139 @@ class UIManager {
     static async loadPage(pageName) {
         try {
             const response = await fetch(`pages/${pageName}.html`);
+            if (!response.ok) {
+                throw new Error(`Failed to load page: ${pageName}`);
+            }
+            
             const html = await response.text();
             document.getElementById('app-container').innerHTML = html;
+            
+            // Initialize page-specific JavaScript
             await this.initializePage(pageName);
+            
         } catch (error) {
-            this.showError('Failed to load page');
+            console.error('Page load error:', error);
+            this.showError('Failed to load page. Please refresh.');
         }
     }
     
     static async initializePage(pageName) {
         switch(pageName) {
             case 'login':
-                document.getElementById('login-form')?.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    await this.handleLogin();
-                });
-                document.getElementById('pin-input')?.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.handleLogin();
-                });
+                await this.initializeLoginPage();
                 break;
-                
             case 'dashboard':
-                if (!AuthService.isAuthenticated()) {
-                    window.location.hash = '#login';
-                    return;
-                }
-                const config = AuthService.getCurrentConfig();
-                initDataService(config);
-                await this.loadData();
-                
-                document.querySelectorAll('.tab-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => this.switchTab(e.target.dataset.tab));
-                });
-                
-                document.getElementById('refresh-btn')?.addEventListener('click', () => this.loadData());
-                document.getElementById('export-btn')?.addEventListener('click', () => this.exportData());
-                document.getElementById('logout-btn')?.addEventListener('click', () => this.handleLogout());
-                document.getElementById('prev-page')?.addEventListener('click', () => this.changePage(-1));
-                document.getElementById('next-page')?.addEventListener('click', () => this.changePage(1));
-                this.updateInfoTab();
+                await this.initializeDashboardPage();
                 break;
-                
             case 'form':
-                const dateInput = document.getElementById('dated');
-                if (dateInput) dateInput.valueAsDate = new Date();
-                
-                document.getElementById('data-form')?.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    await this.handleFormSubmit();
-                });
+                await this.initializeFormPage();
                 break;
         }
     }
     
-    static async handleLogin() {
-        const pin = document.getElementById('pin-input').value.trim();
-        const alertDiv = document.getElementById('login-alert');
+    static async initializeLoginPage() {
+        // Add event listener for login form
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await this.handleLogin();
+            });
+        }
         
-        if (!pin) {
-            this.showAlert(alertDiv, 'Please enter PIN', 'error');
+        // Add Enter key support
+        const pinInput = document.getElementById('pin-input');
+        if (pinInput) {
+            pinInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.handleLogin();
+                }
+            });
+        }
+    }
+    
+    static async initializeDashboardPage() {
+        // Check authentication
+        if (!AuthService.isAuthenticated()) {
+            window.location.hash = '#login';
             return;
         }
         
-        this.showAlert(alertDiv, 'Checking PIN...', 'info');
+        // Initialize data service
+        const config = AuthService.getCurrentConfig();
+        initDataService(config);
+        
+        // Load data
+        await this.loadData();
+        
+        // Set up tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.switchTab(e.target.dataset.tab);
+            });
+        });
+        
+        // Set up control buttons
+        document.getElementById('refresh-btn')?.addEventListener('click', () => this.loadData());
+        document.getElementById('export-btn')?.addEventListener('click', () => this.exportData());
+        document.getElementById('logout-btn')?.addEventListener('click', () => this.handleLogout());
+        
+        // Set up pagination
+        document.getElementById('prev-page')?.addEventListener('click', () => this.changePage(-1));
+        document.getElementById('next-page')?.addEventListener('click', () => this.changePage(1));
+        
+        // Update info tab
+        this.updateInfoTab();
+    }
+    
+    static async initializeFormPage() {
+        // Check authentication
+        if (!AuthService.isAuthenticated()) {
+            window.location.hash = '#login';
+            return;
+        }
+        
+        // Set today's date
+        const dateInput = document.getElementById('dated');
+        if (dateInput) {
+            dateInput.valueAsDate = new Date();
+        }
+        
+        // Handle form submission
+        const form = document.getElementById('data-form');
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await this.handleFormSubmit();
+            });
+        }
+    }
+    
+    static async handleLogin() {
+        const pinInput = document.getElementById('pin-input');
+        const pin = pinInput.value.trim();
+        const alertDiv = document.getElementById('login-alert');
+        
+        if (!pin) {
+            this.showAlert(alertDiv, 'Please enter a PIN', 'error');
+            return;
+        }
+        
+        this.showAlert(alertDiv, '🔍 Encrypting PIN and checking database...', 'info');
+        
         const result = await AuthService.login(pin);
         
         if (result.success) {
-            this.showAlert(alertDiv, '✅ Login successful!', 'success');
-            setTimeout(() => window.location.hash = '#dashboard', 1000);
+            this.showAlert(alertDiv, '✅ Login successful! Loading dashboard...', 'success');
+            setTimeout(() => {
+                window.location.hash = '#dashboard';
+            }, 1000);
         } else {
             this.showAlert(alertDiv, `Login failed: ${result.error}`, 'error');
         }
     }
     
-    static handleLogout() {
+    static async handleLogout() {
         AuthService.logout();
         window.location.hash = '#login';
     }
@@ -85,21 +144,22 @@ class UIManager {
         const alertDiv = document.getElementById('data-alert');
         
         this.showLoading(loadingEl, true);
-        this.showAlert(alertDiv, 'Loading data...', 'info');
+        this.showAlert(alertDiv, 'Loading data from your project...', 'info');
         
         const service = getDataService();
         if (!service) {
-            this.showAlert(alertDiv, 'Service not initialized', 'error');
+            this.showAlert(alertDiv, 'Data service not initialized', 'error');
             return;
         }
         
         const result = await service.fetchAllData();
+        
         if (result.success) {
             this.updateStatistics();
             this.renderData();
-            this.showAlert(alertDiv, `✅ Loaded ${result.totalRecords} records`, 'success');
+            this.showAlert(alertDiv, `✅ Successfully loaded ${result.totalRecords} records`, 'success');
         } else {
-            this.showAlert(alertDiv, `Error: ${result.error}`, 'error');
+            this.showAlert(alertDiv, `Error loading data: ${result.error}`, 'error');
         }
         
         this.showLoading(loadingEl, false);
@@ -113,7 +173,14 @@ class UIManager {
         const tbody = document.getElementById('data-body');
         
         if (pageData.totalRecords === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center">No data found</td></tr>';
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center" style="padding: 40px; color: #64748b;">
+                        📭 No data found in your project
+                    </td>
+                </tr>
+            `;
+            this.updatePaginationControls();
             return;
         }
         
@@ -122,24 +189,34 @@ class UIManager {
                 <td><strong>${item.forms_sr_no || '-'}</strong></td>
                 <td>${this.formatDate(item.dated)}</td>
                 <td>${item.filled_by || '-'}</td>
-                <td>${this.truncateText(item.todays_select_items_to_buy, 40)}</td>
+                <td title="${item.todays_select_items_to_buy || ''}">
+                    ${this.truncateText(item.todays_select_items_to_buy, 40)}
+                </td>
                 <td>${item.approximately_amount ? '₹' + parseFloat(item.approximately_amount).toFixed(2) : '-'}</td>
                 <td>${this.truncateText(item.comments_about_today_purchase, 30)}</td>
                 <td>
-                    <button onclick="UIManager.deleteRecord(${item.id})" class="btn-danger" style="padding: 5px 10px;">
+                    <button onclick="UIManager.deleteRecord(${item.id})" 
+                            class="btn-danger" 
+                            style="padding: 5px 10px; font-size: 12px;">
                         🗑️
                     </button>
                 </td>
             </tr>
         `).join('');
         
-        document.getElementById('page-info').textContent = 
-            `Showing ${pageData.startIndex}-${pageData.endIndex} of ${pageData.totalRecords}`;
-        document.getElementById('page-display').textContent = 
-            `Page ${pageData.currentPage} of ${pageData.totalPages}`;
+        // Update pagination info
+        const pageInfo = document.getElementById('page-info');
+        const pageDisplay = document.getElementById('page-display');
         
-        document.getElementById('prev-page').disabled = pageData.currentPage <= 1;
-        document.getElementById('next-page').disabled = pageData.currentPage >= pageData.totalPages;
+        if (pageInfo) {
+            pageInfo.textContent = `Showing ${pageData.startIndex}-${pageData.endIndex} of ${pageData.totalRecords} records`;
+        }
+        
+        if (pageDisplay) {
+            pageDisplay.textContent = `Page ${pageData.currentPage} of ${pageData.totalPages}`;
+        }
+        
+        this.updatePaginationControls();
     }
     
     static async handleFormSubmit() {
@@ -148,57 +225,101 @@ class UIManager {
         const data = Object.fromEntries(formData);
         const alertDiv = document.getElementById('form-alert');
         
-        if (!data.forms_sr_no || !data.dated || !data.filled_by || !data.approximately_amount || !data.todays_select_items_to_buy) {
-            this.showAlert(alertDiv, 'Please fill all required fields', 'error');
-            return;
+        // Validate required fields
+        const required = ['forms_sr_no', 'dated', 'filled_by', 'approximately_amount', 'todays_select_items_to_buy'];
+        for (const field of required) {
+            if (!data[field]) {
+                this.showAlert(alertDiv, `Please fill in the ${field.replace(/_/g, ' ')} field`, 'error');
+                return;
+            }
         }
         
-        data.dated = new Date(data.dated).toISOString();
-        this.showAlert(alertDiv, 'Saving...', 'info');
+        // Convert date to ISO string
+        if (data.dated) {
+            data.dated = new Date(data.dated).toISOString();
+        }
+        
+        this.showAlert(alertDiv, 'Saving data to your project...', 'info');
         
         const service = getDataService();
         if (!service) {
-            this.showAlert(alertDiv, 'Service not initialized', 'error');
+            this.showAlert(alertDiv, 'Data service not initialized', 'error');
             return;
         }
         
         const result = await service.createRecord(data);
+        
         if (result.success) {
-            this.showAlert(alertDiv, '✅ Saved successfully!', 'success');
+            this.showAlert(alertDiv, '✅ Data saved successfully!', 'success');
             form.reset();
-            document.getElementById('dated').valueAsDate = new Date();
+            
+            // Set today's date again
+            const dateInput = document.getElementById('dated');
+            if (dateInput) {
+                dateInput.valueAsDate = new Date();
+            }
+            
+            // Update statistics
             this.updateStatistics();
+            
+            // If on dashboard, refresh data display
+            if (window.location.hash === '#dashboard') {
+                this.renderData();
+            }
         } else {
-            this.showAlert(alertDiv, `Error: ${result.error}`, 'error');
+            this.showAlert(alertDiv, `Error saving data: ${result.error}`, 'error');
         }
     }
     
     static async deleteRecord(id) {
-        if (!confirm('Delete this record?')) return;
+        if (!confirm('Are you sure you want to delete this record?')) {
+            return;
+        }
+        
+        const alertDiv = document.getElementById('data-alert');
+        this.showAlert(alertDiv, 'Deleting record...', 'info');
+        
         const service = getDataService();
-        if (!service) return;
+        if (!service) {
+            this.showAlert(alertDiv, 'Data service not initialized', 'error');
+            return;
+        }
         
         const result = await service.deleteRecord(id);
+        
         if (result.success) {
+            this.showAlert(alertDiv, '✅ Record deleted successfully!', 'success');
             this.updateStatistics();
             this.renderData();
+        } else {
+            this.showAlert(alertDiv, `Error deleting record: ${result.error}`, 'error');
         }
     }
     
     static exportData() {
         const service = getDataService();
-        if (!service) return;
+        if (!service) {
+            this.showAlert(document.getElementById('data-alert'), 'Data service not initialized', 'error');
+            return;
+        }
         
         const csv = service.exportToCSV();
-        if (!csv) return;
+        if (!csv) {
+            this.showAlert(document.getElementById('data-alert'), 'No data to export', 'error');
+            return;
+        }
         
         const blob = new Blob([csv], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `family_data_${new Date().toISOString().split('T')[0]}.csv`;
+        a.download = `family_data_${AuthService.getCurrentPin()}_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
         a.click();
+        document.body.removeChild(a);
         URL.revokeObjectURL(url);
+        
+        this.showAlert(document.getElementById('data-alert'), `✅ Exported ${service.totalRecords} records to CSV`, 'success');
     }
     
     static updateStatistics() {
@@ -206,11 +327,17 @@ class UIManager {
         if (!service) return;
         
         const stats = service.getStatistics();
+        
         document.getElementById('total-records').textContent = stats.totalRecords;
         document.getElementById('today-records').textContent = stats.todayRecords;
         document.getElementById('total-amount').textContent = `₹${stats.totalAmount.toFixed(2)}`;
         document.getElementById('unique-users').textContent = stats.uniqueUsers;
-        document.getElementById('record-count').textContent = stats.totalRecords;
+        
+        // Update record count in connection info
+        const recordCount = document.getElementById('record-count');
+        if (recordCount) {
+            recordCount.textContent = stats.totalRecords;
+        }
     }
     
     static updateInfoTab() {
@@ -218,72 +345,30 @@ class UIManager {
         const pin = AuthService.getCurrentPin();
         const service = getDataService();
         
-        if (config && pin) {
-            document.getElementById('info-pin').textContent = pin;
-            document.getElementById('info-encrypted-pin').textContent = AuthService.encrypt(pin);
-            document.getElementById('info-url').textContent = config.url;
-            document.getElementById('info-api-key').textContent = config.key.substring(0, 30) + '...';
-            
-            if (service) {
-                document.getElementById('current-page-info').textContent = service.currentPage;
-                document.getElementById('total-pages-info').textContent = service.totalPages;
-                document.getElementById('memory-records').textContent = service.totalRecords;
-            }
-        }
-    }
-    
-    static switchTab(tabName) {
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        if (!config || !pin) return;
         
-        document.querySelector(`[data-tab="${tabName}"]`)?.classList.add('active');
-        document.getElementById(`${tabName}-tab`)?.classList.add('active');
+        // Login info
+        document.getElementById('info-pin').textContent = pin;
+        document.getElementById('info-encrypted-pin').textContent = AuthService.encrypt(pin);
         
-        if (tabName === 'info') this.updateInfoTab();
-    }
-    
-    static changePage(direction) {
-        const service = getDataService();
-        if (!service) return;
+        // Project info
+        document.getElementById('info-url').textContent = config.url;
+        document.getElementById('info-api-key').textContent = 
+            config.key.substring(0, 30) + '...';
         
-        const newPage = service.currentPage + direction;
-        service.getPageData(newPage);
-        this.renderData();
-    }
-    
-    static showAlert(element, message, type) {
-        if (!element) return;
-        element.textContent = message;
-        element.className = `alert alert-${type}`;
-        element.style.display = 'block';
-        setTimeout(() => { element.style.display = 'none'; }, 5000);
-    }
-    
-    static showLoading(element, show) {
-        if (element) element.style.display = show ? 'block' : 'none';
-    }
-    
-    static formatDate(dateString) {
-        if (!dateString) return '-';
-        try {
-            return new Date(dateString).toLocaleDateString('en-IN');
-        } catch {
-            return dateString;
-        }
-    }
-    
-    static truncateText(text, maxLength) {
-        if (!text) return '-';
-        return text.length <= maxLength ? text : text.substring(0, maxLength) + '...';
-    }
-}
-
-window.addEventListener('hashchange', handleHashChange);
-window.addEventListener('load', handleHashChange);
-
-async function handleHashChange() {
-    const hash = window.location.hash.substring(1) || 'login';
-    await UIManager.loadPage(hash);
-}
-
-window.UIManager = UIManager;
+        // Encryption demo
+        document.getElementById('original-url').textContent = 
+            config.adminRecord?.url_enc ? AuthService.decrypt(config.adminRecord.url_enc) : '-';
+        document.getElementById('encrypted-url').textContent = 
+            config.adminRecord?.url_enc || '-';
+        document.getElementById('original-key').textContent = 
+            config.adminRecord?.key_enc ? AuthService.decrypt(config.adminRecord.key_enc).substring(0, 30) + '...' : '-';
+        document.getElementById('encrypted-key').textContent = 
+            config.adminRecord?.key_enc?.substring(0, 30) + '...' || '-';
+        
+        // Load strategy info
+        if (service) {
+            document.getElementById('current-page-info').textContent = service.currentPage;
+            document.getElementById('total-pages-info').textContent = service.totalPages;
+            document.getElementById('memory-records').textContent = service.totalRecords;
+            document.getElementById('info-total-records').textContent = service.totalRecords;
