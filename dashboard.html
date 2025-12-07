@@ -1,0 +1,103 @@
+<div class="container">
+    <div class="card">
+        <div class="header">
+            <h1>📊 Family Data Manager</h1>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="window.location.hash='#form'" class="btn-success">📝 New Entry</button>
+                <button id="logout-btn" class="btn-secondary">👋 Logout</button>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="view-data">📊 View Data</button>
+            <button class="tab-btn" data-tab="info">ℹ️ Info</button>
+        </div>
+        
+        <div id="view-data-tab" class="tab-content active">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: #1e293b;">📊 View All Data</h2>
+                <div class="page-info" id="page-info">Loading...</div>
+            </div>
+            
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                <div class="info-item">
+                    <span class="info-label">Connected To:</span>
+                    <span class="info-value" id="connected-url">Loading...</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Records Loaded:</span>
+                    <span class="info-value" id="record-count">0</span>
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-number" id="total-records">0</div><div class="stat-label">Total Records</div></div>
+                <div class="stat-card"><div class="stat-number" id="today-records">0</div><div class="stat-label">Today's Records</div></div>
+                <div class="stat-card"><div class="stat-number" id="total-amount">₹0</div><div class="stat-label">Total Amount</div></div>
+                <div class="stat-card"><div class="stat-number" id="unique-users">0</div><div class="stat-label">Unique Users</div></div>
+            </div>
+            
+            <div id="data-loading" class="loading-screen">
+                <div class="loading-spinner"></div>
+                <p>Loading data from your project...</p>
+            </div>
+            
+            <div id="data-container">
+                <div class="data-table-container">
+                    <table class="data-table" id="data-table">
+                        <thead>
+                            <tr>
+                                <th>SR No</th><th>Date</th><th>Filled By</th><th>Items</th><th>Amount</th><th>Comments</th><th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-body"></tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination">
+                    <button class="pagination-btn" id="prev-page" disabled>← Previous</button>
+                    <span class="page-info" id="page-display">Page 1 of 1</span>
+                    <button class="pagination-btn" id="next-page" disabled>Next →</button>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button id="refresh-btn" class="btn">🔄 Refresh Data</button>
+                <button id="export-btn" class="btn-secondary">📥 Export CSV</button>
+            </div>
+            
+            <div id="data-alert" class="alert"></div>
+        </div>
+        
+        <div id="info-tab" class="tab-content">
+            <h2 style="margin-bottom: 25px; color: #1e293b;">ℹ️ Connection Information</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>🔐 Login Details</h3>
+                    <div class="info-item"><span class="info-label">Entered PIN:</span><span class="info-value" id="info-pin">-</span></div>
+                    <div class="info-item"><span class="info-label">Encrypted PIN:</span><span class="info-value" id="info-encrypted-pin">-</span></div>
+                </div>
+                <div class="info-card">
+                    <h3>🌐 Project Connection</h3>
+                    <div class="info-item"><span class="info-label">Connected URL:</span><span class="info-value" id="info-url">-</span></div>
+                    <div class="info-item"><span class="info-label">API Key:</span><span class="info-value" id="info-api-key">-</span></div>
+                </div>
+                <div class="info-card">
+                    <h3>📊 Load Strategy</h3>
+                    <div class="info-item"><span class="info-label">Current Page:</span><span class="info-value" id="current-page-info">1</span></div>
+                    <div class="info-item"><span class="info-label">Total Pages:</span><span class="info-value" id="total-pages-info">1</span></div>
+                    <div class="info-item"><span class="info-label">Records in Memory:</span><span class="info-value" id="memory-records">0</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const config = window.AuthService?.getCurrentConfig();
+        if (config) {
+            document.getElementById('connected-url').textContent = config.url;
+        }
+    });
+</script>
